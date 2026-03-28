@@ -22,11 +22,11 @@ Goal: Initialize the stack and establish core dependencies.
 - [x] **Agent Action**: Configure `build.gradle.kts` with required dependencies (Room, Ktor, Koin, Coil, Compose Navigation 3, Calf permissions). Only do this AFTER targets have been purged.
     *   **Note**: If facing `Unresolved reference 'androidx.savedstate:savedstate-compose-serialization'` during dependency resolution, ensure this dependency is *removed* from `libs.versions.toml` and `build.gradle.kts`. Navigation 3 in KMP handles `NavKey` serialization via `SavedStateConfiguration` and `kotlinx.serialization.modules` directly, as documented in `.skills/tasks/kmp-baseline/kmp-baseline-hints-task/SKILL.md`.
 - [x] **User Action**: Confirm that the project builds and runs on Android and iOS.
-- [ ] **Agent Action**: Run `git add . && git commit -m "Phase 1 started"`.
-- [ ] **User Action**: Add `film_noir.png` to codebase at `shared/src/commonMain/composeResources/drawable/film_noir.png`.
-- [ ] **Agent Action**: Set `film_noir.png` as background image in `App.kt` immediately to verify resource loading.
-- [ ] **Agent Action**: Adjust application style and theme based on `film_noir.png` aesthetic. Ensure text legibility on dark backgrounds by explicitly setting `contentColor = MaterialTheme.colorScheme.onSurface` on Cards and other containers.
-- [ ] **User Action**: Confirm that the app builds and runs with the background image.
+- [x] **Agent Action**: Run `git add . && git commit -m "Phase 1 started"`.
+- [x] **User Action**: Add `film_noir.png` to codebase at `shared/src/commonMain/composeResources/drawable/film_noir.png`.
+- [x] **Agent Action**: Set `film_noir.png` as background image in `App.kt` immediately to verify resource loading.
+- [x] **Agent Action**: Adjust application style and theme based on `film_noir.png` aesthetic. Ensure text legibility on dark backgrounds by explicitly setting `contentColor = MaterialTheme.colorScheme.onSurface` on Cards and other containers.
+- [x] **User Action**: Confirm that the app builds and runs with the background image.
 - [ ] **Agent Action**: Run `git add . && git commit -m "Phase 1 complete"`.
 - [ ] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 1 completion.
 
