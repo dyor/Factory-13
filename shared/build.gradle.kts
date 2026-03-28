@@ -1,10 +1,30 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+val geminiApiKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
+    alias(libs.plugins.buildConfig)
+}
+
+buildConfig {
+    buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
+    packageName("org.example.project.shared")
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
@@ -38,6 +58,10 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.ktor.client.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -48,6 +72,15 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
+            implementation(libs.navigation3.ui)
+            implementation(libs.koin.core)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network)
+            implementation(libs.calf.permissions)
+            implementation(libs.ktor.client.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -57,4 +90,7 @@ kotlin {
 
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }

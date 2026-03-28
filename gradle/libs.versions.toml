@@ -14,6 +14,16 @@ junit = "4.13.2"
 kotlin = "2.3.20-Beta2"
 material3 = "1.11.0-alpha02"
 
+room = "2.7.0-alpha13"
+ksp = "2.3.2"
+sqlite = "2.5.0-alpha13"
+navigation3 = "1.0.0-alpha06"
+koin = "4.1.1"
+coil = "3.3.0"
+ktor = "3.1.0"
+calf = "0.5.5"
+buildConfig = "3.1.0"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -33,9 +43,39 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMul
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+
+navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+
+calf-permissions = { module = "com.mohamedrejeb.calf:calf-permissions", version.ref = "calf" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
+
+
+
+
+
+
+
+
+

@@ -449,6 +449,8 @@ actual fun getInMemoryDatabase(): AppDatabase {
     2. If that fails, go to **File -> Invalidate Caches... -> Check 'Clear file system cache and Local History' -> Invalidate and Restart**.
 
 #### iOS Build & Xcode Troubleshooting (CRITICAL)
+*   **Problem**: The `iosApp` run configuration target mysteriously disappears from the Android Studio run targets dropdown.
+*   **Solution**: This is a known IDE sync issue with the Kotlin Multiplatform plugin. The fix is to update the Kotlin Multiplatform plugin in Android Studio to the latest version and restart the IDE.
 *   **Problem**: You get vague Kotlin iOS linkage or compilation errors (e.g., `linkDebugFrameworkIosSimulatorArm64` fails, `Cannot infer a bundle ID`, etc.) and running Gradle commands or grepping errors doesn't give a clear reason.
 *   **Solution**: The issue is often native Xcode configuration, most commonly missing Provisioning Profiles or Team Signing. **Do not randomly execute gradle commands to diagnose iOS native errors.**
 *   **Steps to Fix**:
