@@ -140,6 +140,7 @@ To efficiently extend this codebase:
 1. **NO REDUNDANT READS**: Never read the same file multiple times consecutively unless it was externally modified. Trust your context window and memory.
 2. **USE BUILT-IN IDE TOOLS**: ALWAYS use the built-in `read_file` tool instead of `run_shell_command("cat ...")`. ALWAYS use `find_files` or `code_search` instead of `run_shell_command("find ...")`. Raw shell commands for text inspection are strictly forbidden.
 3. **BREAK OUT OF LOOPS**: If you find yourself verifying the same files or repeating the same actions without marking a checklist item as complete, STOP. Acknowledge the loop and explicitly move to the next actionable step.
+4. **STOP ON USER ACTIONS:** You must process the `kmp-baseline-guide-task` strictly sequentially. If the next unchecked item in the guide is a `User Action`, you **MUST STOP** execution, explicitly prompt the user to complete that action, and wait for their confirmation. Do NOT proceed to subsequent `Agent Action`s or `Validation`s until the user confirms the step is done.
 
 ## Common Tasks
 *   **Update Kotlin Version:** Edit `kotlin` version in `libs.versions.toml`.

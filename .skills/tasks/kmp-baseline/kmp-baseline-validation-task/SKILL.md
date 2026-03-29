@@ -23,8 +23,8 @@ Goal: Verify that the main UI framework boots and navigation correctly routes be
 ## Journey 2: Writer's Room
 Goal: Verify that the user can generate, fine-tune, edit, and persist a script using Gemini.
 
-- [ ] **Agent Validation**: Ensure that API mock tests for Gemini are passing and the Room Database successfully persists `Script` entities with `Target Duration`.
-- [ ] **User Validation**: Navigate to the Writer's Room. Select a target duration (5s to 60s) using the slider. Click generate and ensure a valid script appears within 60 seconds. Edit a portion of the script text, tap 'Save', and verify it persists correctly. Confirm that saving automatically enables navigation to the Recording Studio.
+- [x] **Agent Validation**: Ensure that API mock tests for Gemini are passing and the Room Database successfully persists `Script` entities with `Target Duration`.
+- [x] **User Validation**: Navigate to the Writer's Room. Select a target duration (5s to 60s) using the slider. Click generate and ensure a valid script appears within 60 seconds. Edit a portion of the script text, tap 'Save', and verify it persists correctly. Confirm that saving automatically enables navigation to the Recording Studio.
 
 ## Journey 3: Recording Studio
 Goal: Verify that the user can record video using the front-facing camera while following the teleprompter.

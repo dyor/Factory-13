@@ -36,6 +36,10 @@ import androidx.savedstate.compose.serialization.serializers.SnapshotStateListSe
 
 import org.example.project.permissions.AppPermissionsHandler
 
+import org.example.project.ui.writersroom.WritersRoomScreen
+import org.example.project.ui.writersroom.WritersRoomViewModel
+import org.example.project.di.AppContainer
+
 @Composable
 @Preview
 fun App() {
@@ -90,16 +94,17 @@ fun App() {
                                 }
                             }
                             entry<Screen.WritersRoom> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Writers Room Placeholder")
-                                    Button(onClick = { onBack() }) {
-                                        Text("Back to Home")
-                                    }
+                                val viewModel = remember { 
+                                    WritersRoomViewModel(
+                                        scriptDao = AppContainer.scriptDao,
+                                        geminiClient = AppContainer.geminiClient
+                                    ) 
                                 }
+                                WritersRoomScreen(
+                                    viewModel = viewModel,
+                                    onNavigateBack = onBack,
+                                    onNavigateToRecording = { backStack.add(Screen.RecordingStudio) }
+                                )
                             }
                             entry<Screen.RecordingStudio> {
                                 Column(

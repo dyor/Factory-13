@@ -25,4 +25,7 @@ interface ScriptDao {
 
     @Query("UPDATE script SET isActive = 0")
     suspend fun clearActiveScript()
+
+    @Query("UPDATE script SET isActive = 1 WHERE id = :id")
+    suspend fun setActiveScript(id: Long)
 }
