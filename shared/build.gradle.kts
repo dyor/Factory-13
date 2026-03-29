@@ -15,16 +15,17 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.buildConfig)
 }
 
 buildConfig {
     buildConfigField("String", "GEMINI_API_KEY", "\"${geminiApiKey}\"")
-    packageName("org.example.project.shared")
+    packageName = "org.example.project.shared"
 }
 
 room {
-    schemaDirectory("$projectDir/schemas")
+    schemaDirectory("${project.projectDir}/schemas")
 }
 
 kotlin {
@@ -38,7 +39,6 @@ kotlin {
         }
     }
     
-    
     androidLibrary {
        namespace = "org.example.project.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -49,9 +49,6 @@ kotlin {
        }
        androidResources {
            enable = true
-       }
-       withHostTest {
-           isIncludeAndroidResources = true
        }
     }
     
@@ -72,18 +69,28 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+            implementation(libs.kotlinx.serialization.json)
             
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.navigation3.ui)
+            implementation(libs.androidx.lifecycle.viewmodel.navigation3)
             implementation(libs.koin.core)
             implementation(libs.coil.compose)
             implementation(libs.coil.network)
             implementation(libs.calf.permissions)
             implementation(libs.ktor.client.core)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.test.core)
+            implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.espresso.core)
+            implementation(libs.room.runtime)
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

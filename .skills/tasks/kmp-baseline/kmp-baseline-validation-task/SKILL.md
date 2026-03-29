@@ -17,8 +17,8 @@ This document contains a rigorous, multi-layered testing plan tailored precisely
 ## Journey 1: Core Navigation
 Goal: Verify that the main UI framework boots and navigation correctly routes between major app destinations.
 
-- [ ] **Agent Validation**: Ensure that UI tests covering the 5 main buttons on the Home screen pass.
-- [ ] **User Validation**: Launch the app. Confirm the Home screen displays 5 buttons (Writers Room, Recording Studio, Editing Studio, Publishing Studio, Archives), and that tapping each correctly navigates to its respective empty screen with a functional 'Home' back button.
+- [x] **Agent Validation**: Ensure that UI tests covering the 5 main buttons on the Home screen pass.
+- [x] **User Validation**: Launch the app. Confirm the Home screen displays 5 buttons (Writers Room, Recording Studio, Editing Studio, Publishing Studio, Archives), and that tapping each correctly navigates to its respective empty screen with a functional 'Home' back button.
 
 ## Journey 2: Writer's Room
 Goal: Verify that the user can generate, fine-tune, edit, and persist a script using Gemini.

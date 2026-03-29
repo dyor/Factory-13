@@ -25,6 +25,15 @@ import kotlinproject.shared.generated.resources.Res
 import kotlinproject.shared.generated.resources.compose_multiplatform
 import kotlinproject.shared.generated.resources.film_noir
 
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.compose.runtime.mutableStateListOf
+import org.example.project.ui.Screen
+import androidx.compose.runtime.saveable.rememberSerializable
+import androidx.savedstate.compose.serialization.serializers.SnapshotStateListSerializer
+
 @Composable
 @Preview
 fun App() {
@@ -36,7 +45,12 @@ fun App() {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            var showContent by remember { mutableStateOf(false) }
+            
+            val backStack = rememberSerializable(serializer = SnapshotStateListSerializer()) {
+                mutableStateListOf<Screen>(Screen.Home)
+            }
+            val onBack = { if (backStack.size > 1) backStack.removeLast() }
+
             Column(
                 modifier = Modifier
                     .widthIn(max = 600.dp)
@@ -44,26 +58,64 @@ fun App() {
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Button(onClick = { showContent = !showContent }) {
-                    Text("Click me!")
-                }
-                AnimatedVisibility(showContent) {
-                    val greeting = remember { Greeting().greet() }
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Image(painterResource(Res.drawable.compose_multiplatform), null)
-                            Text("Compose: ${greeting}")
+                NavDisplay(
+                    backStack = backStack,
+                    onBack = onBack,
+                    entryProvider = entryProvider {
+                        entry<Screen.Home> {
+                            Text("Home Screen Placeholder")
+                            Button(onClick = { backStack.add(Screen.WritersRoom) }) {
+                                Text("Go to Writers Room")
+                            }
+                            Button(onClick = { backStack.add(Screen.RecordingStudio) }) {
+                                Text("Go to Recording Studio")
+                            }
+                            Button(onClick = { backStack.add(Screen.EditingStudio) }) {
+                                Text("Go to Editing Studio")
+                            }
+                            Button(onClick = { backStack.add(Screen.PublishingStudio) }) {
+                                Text("Go to Publishing Studio")
+                            }
+                            Button(onClick = { backStack.add(Screen.Archives) }) {
+                                Text("Go to Archives")
+                            }
                         }
-                    }
-                }
+                        entry<Screen.WritersRoom> {
+                            Text("Writers Room Placeholder")
+                            Button(onClick = { onBack() }) {
+                                Text("Back to Home")
+                            }
+                        }
+                        entry<Screen.RecordingStudio> {
+                            Text("Recording Studio Placeholder")
+                            Button(onClick = { onBack() }) {
+                                Text("Back to Home")
+                            }
+                        }
+                        entry<Screen.EditingStudio> {
+                            Text("Editing Studio Placeholder")
+                            Button(onClick = { onBack() }) {
+                                Text("Back to Home")
+                            }
+                        }
+                        entry<Screen.PublishingStudio> {
+                            Text("Publishing Studio Placeholder")
+                            Button(onClick = { onBack() }) {
+                                Text("Back to Home")
+                            }
+                        }
+                        entry<Screen.Archives> {
+                            Text("Archives Placeholder")
+                            Button(onClick = { onBack() }) {
+                                Text("Back to Home")
+                            }
+                        }
+                    },
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator(),
+                    ),
+                )
             }
         }
     }
