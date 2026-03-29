@@ -103,13 +103,13 @@ Goal: Refine the user experience with precise video editing, dynamic durations, 
 - [x] **Agent Action**: Implement a Target Duration slider (5s to 60s) in the Writer's Room and update the Gemini prompt to strictly adhere to the selected duration. Update `Script` entity to store this duration.
 - [x] **Agent Action**: Upgrade the VideoPlayer to support precise seeking (`seekRequest`) and playback state (`isPlaying`) across Android (`VideoView`) and iOS (`AVPlayerViewController`). Add `onTimeUpdate` and `onCompletion` callbacks.
 - [x] **Agent Action**: Implement `resolveVideoPath` expect/actual to handle iOS Simulator UUID changes across rebuilds (searching `NSDocumentDirectory` and `NSTemporaryDirectory`).
-- [ ] **Agent Action**: Refactor the Editing Studio timeline to dynamically generate exactly one block per second of the recorded video using `MediaMetadataRetriever` (Android) and `AVURLAsset` (iOS) to fetch the actual video duration.
-- [ ] **Agent Action**: Implement a "Fine-tune" modal in the Editing Studio allowing tenth-of-a-second skipping granularity (0.0s to 0.9s). Ensure it overlays cleanly at the bottom, auto-pauses the video when open, and seeks directly to the tapped tenth.
-- [ ] **Agent Action**: Add a "Preview without Skipped Frames" button that instantly seeks to the first unskipped tenth of a second and plays through, auto-skipping removed segments and reverting state upon completion.
-- [ ] **Agent Action**: Implement native `VideoTrimmer` (expect/actual) using Android `MediaExtractor`/`MediaMuxer` and iOS `AVMutableComposition` to trim and stitch unskipped tenths of a second into a final `_trimmed.mp4` file without heavy re-encoding. Ensure video rotation/transform metadata is preserved.
-- [ ] **Agent Action**: Standardize bottom navigation across all studio screens to have a consistent "Go Back" and "Go Home" row. Ensure correct back-stack popping logic.
+- [x] **Agent Action**: Refactor the Editing Studio timeline to dynamically generate exactly one block per second of the recorded video using `MediaMetadataRetriever` (Android) and `AVURLAsset` (iOS) to fetch the actual video duration.
+- [x] **Agent Action**: Implement a "Fine-tune" modal in the Editing Studio allowing tenth-of-a-second skipping granularity (0.0s to 0.9s). Ensure it overlays cleanly at the bottom, auto-pauses the video when open, and seeks directly to the tapped tenth.
+- [x] **Agent Action**: Add a "Preview without Skipped Frames" button that instantly seeks to the first unskipped tenth of a second and plays through, auto-skipping removed segments and reverting state upon completion.
+- [x] **Agent Action**: Implement native `VideoTrimmer` (expect/actual) using Android `MediaExtractor`/`MediaMuxer` and iOS `AVMutableComposition` to trim and stitch unskipped tenths of a second into a final `_trimmed.mp4` file without heavy re-encoding. Ensure video rotation/transform metadata is preserved.
+- [x] **Agent Action**: Standardize bottom navigation across all studio screens to have a consistent "Go Back" and "Go Home" row. Ensure correct back-stack popping logic.
 - [x] **Agent Action**: Rebrand the app from "KotlinProject" to "The Factory" in Android (`strings.xml`) and iOS (`Info.plist`).
-- [ ] **Agent Action**: Update the iOS and Android app icons using the `film_noir.png` asset (e.g., using `sips` for macOS to generate `app-icon-1024.png`).
-- [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 6: Enhanced Editing and Polish.
-- [ ] **Agent Action**: Run `git add . && git commit -m "Phase 5: Polish complete"`.
-- [ ] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 5 completion.
+- [x] **Agent Action**: Update the iOS and Android app icons using the `film_noir.png` asset (e.g., using `sips` for macOS to generate `app-icon-1024.png`).
+- [x] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 6: Enhanced Editing and Polish.
+- [x] **Agent Action**: Run `git add . && git commit -m "Phase 5: Polish complete"`.
+- [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 5 completion.
