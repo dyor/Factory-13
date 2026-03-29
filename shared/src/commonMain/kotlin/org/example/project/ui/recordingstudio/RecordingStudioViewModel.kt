@@ -101,6 +101,17 @@ class RecordingStudioViewModel(
         _visibleLines.value = allLines.subList(currentLineIndex, endIndex)
     }
 
+    fun onVideoRecorded(filePath: String) {
+        val currentScript = _activeScript.value
+        if (currentScript != null) {
+            viewModelScope.launch {
+                val updatedScript = currentScript.copy(videoPath = filePath, scriptState = "RECORDING_STUDIO")
+                scriptDao.update(updatedScript)
+                _activeScript.value = updatedScript
+            }
+        }
+    }
+
     fun reset() {
         _isRecording.value = false
         _isFinished.value = false

@@ -35,8 +35,8 @@ Goal: Verify that the user can record video using the front-facing camera while 
 ## Journey 4: Editing Studio
 Goal: Verify that the user can precisely define sections of the recorded video to trim and recover.
 
-- [ ] **Agent Validation**: Verify that timeline scaling and metadata generation correctly load the local file path dynamically created in the Recording Studio.
-- [ ] **User Validation**: Navigate to the Editing Studio. Verify the video player controls. Mark specific sections of the video for removal. Select a 'Save' equivalent to persist the modified video natively, and select a 'Restore' equivalent to reconstruct the original footage. Confirm navigation logic to proceed to the Publishing Studio.
+- [x] **Agent Validation**: Verify that timeline scaling and metadata generation correctly load the local file path dynamically created in the Recording Studio.
+- [x] **User Validation**: Navigate to the Editing Studio. Verify the video player controls. Mark specific sections of the video for removal. Select a 'Save' equivalent to persist the modified video natively, and select a 'Restore' equivalent to reconstruct the original footage. Confirm navigation logic to proceed to the Publishing Studio.
 
 ## Journey 5: Publishing Studio
 Goal: Verify that the user can seamlessly share the generated and edited video to external channels.

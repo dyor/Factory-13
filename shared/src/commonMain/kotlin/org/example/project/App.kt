@@ -43,6 +43,9 @@ import org.example.project.di.AppContainer
 import org.example.project.ui.recordingstudio.RecordingStudioScreen
 import org.example.project.ui.recordingstudio.RecordingStudioViewModel
 
+import org.example.project.ui.editingstudio.EditingStudioScreen
+import org.example.project.ui.editingstudio.EditingStudioViewModel
+
 @Composable
 @Preview
 fun App() {
@@ -120,16 +123,14 @@ fun App() {
                                 )
                             }
                             entry<Screen.EditingStudio> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Editing Studio Placeholder")
-                                    Button(onClick = { onBack() }) {
-                                        Text("Back to Home")
-                                    }
+                                val editingViewModel = remember {
+                                    EditingStudioViewModel(scriptDao = AppContainer.scriptDao)
                                 }
+                                EditingStudioScreen(
+                                    viewModel = editingViewModel,
+                                    onNavigateBack = onBack,
+                                    onNavigateForward = { backStack.add(Screen.PublishingStudio) }
+                                )
                             }
                             entry<Screen.PublishingStudio> {
                                 Column(

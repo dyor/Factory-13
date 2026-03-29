@@ -11,5 +11,6 @@ data class Script(
     val content: String,
     val targetDuration: Int? = null,
     val isActive: Boolean = false,
-    val scriptState: String = "WRITERS_ROOM"
+    val scriptState: String = "WRITERS_ROOM",
+    val videoPath: String? = null
 )

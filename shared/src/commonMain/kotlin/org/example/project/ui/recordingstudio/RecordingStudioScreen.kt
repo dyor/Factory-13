@@ -45,6 +45,7 @@ fun RecordingStudioScreen(
                     val result = event.result
                     if (result is VideoCaptureResult.Success) {
                         println("Video recorded to: ${result.filePath}")
+                        viewModel.onVideoRecorded(result.filePath)
                     }
                 }
                 else -> {}
