@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import org.example.project.domain.Script
 import org.example.project.domain.ScriptDao
 import org.example.project.domain.gemini.GeminiClient
-import kotlinx.datetime.Clock
 
 class WritersRoomViewModel(
     private val scriptDao: ScriptDao,
@@ -51,7 +50,7 @@ class WritersRoomViewModel(
         viewModelScope.launch {
             scriptDao.clearActiveScript()
             val newScript = Script(
-                title = "Generated Script ${Clock.System.now()}",
+                title = "Generated Script",
                 content = _generatedScript.value,
                 targetDuration = _targetDuration.value,
                 isActive = true

@@ -31,7 +31,11 @@ kotlinx-datetime = "0.6.1"
 
 robolectric = "4.12.2"
 
+camerak = "0.4"
+
 [libraries]
+camerak = { module = "io.github.kashif-mehmood-km:camerak", version.ref = "camerak" }
+camerak-video = { module = "io.github.kashif-mehmood-km:video_recorder_plugin", version.ref = "camerak" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }

@@ -76,7 +76,12 @@ fun WritersRoomScreen(
                 .fillMaxWidth()
                 .weight(1f),
             label = { Text("Script Content") },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))

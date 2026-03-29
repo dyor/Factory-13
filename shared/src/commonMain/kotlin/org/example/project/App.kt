@@ -40,6 +40,9 @@ import org.example.project.ui.writersroom.WritersRoomScreen
 import org.example.project.ui.writersroom.WritersRoomViewModel
 import org.example.project.di.AppContainer
 
+import org.example.project.ui.recordingstudio.RecordingStudioScreen
+import org.example.project.ui.recordingstudio.RecordingStudioViewModel
+
 @Composable
 @Preview
 fun App() {
@@ -107,16 +110,14 @@ fun App() {
                                 )
                             }
                             entry<Screen.RecordingStudio> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Recording Studio Placeholder")
-                                    Button(onClick = { onBack() }) {
-                                        Text("Back to Home")
-                                    }
+                                val recordingViewModel = remember {
+                                    RecordingStudioViewModel(scriptDao = AppContainer.scriptDao)
                                 }
+                                RecordingStudioScreen(
+                                    viewModel = recordingViewModel,
+                                    onNavigateBack = onBack,
+                                    onNavigateForward = { backStack.add(Screen.EditingStudio) }
+                                )
                             }
                             entry<Screen.EditingStudio> {
                                 Column(

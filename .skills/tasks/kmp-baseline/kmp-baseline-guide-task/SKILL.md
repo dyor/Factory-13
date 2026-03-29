@@ -64,13 +64,13 @@ Goal: Implement device-specific features (Camera, Audio, Location, etc.).
 - [x] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 2: Writer's Room.
 - [x] **Agent Action**: Run `git add . && git commit -m "Phase 3: Writer's Room complete"`.
 - [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to track Phase 3 progress.
-- [ ] **Agent Action**: Allow the user to navigate to the Recording Studio after they save a script.
-- [ ] **Agent Action**: For the Recording Studio, show a front-facing camera view with a start button on the bottom half of the screen, and on the top half of the screen show the active script. Use `CameraKScreen` from the `io.github.kashif-mehmood-km:camerak` library for a robust multiplatform camera implementation. Ensure the camera preview is not consuming touch events by adding `Modifier.clickable(enabled = false, onClick = {})` to it.
-- [ ] **Agent Action**: Implement `RecordingStudioViewModel` to manage a 5-second countdown and teleprompter logic that displays 3 lines at a time and advances them to finish the script in 60 seconds. The `RecordingStudioScreen` should observe the active script from the ViewModel.
-- [ ] **Agent Action**: When the recording is done, allow user to re-record. Also include navigation to go back (to Writer's Room) and forward (to Editing Studio).
-- [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 3: Recording Studio.
-- [ ] **Agent Action**: Run `git add . && git commit -m "Phase 3: Recording Studio complete"`.
-- [ ] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to track Phase 3 progress.
+- [x] **Agent Action**: Allow the user to navigate to the Recording Studio after they save a script.
+- [x] **Agent Action**: For the Recording Studio, show a front-facing camera view with a start button on the bottom half of the screen, and on the top half of the screen show the active script. Use `CameraKScreen` from the `io.github.kashif-mehmood-km:camerak` library for a robust multiplatform camera implementation. Ensure the camera preview is not consuming touch events by adding `Modifier.clickable(enabled = false, onClick = {})` to it.
+- [x] **Agent Action**: Implement `RecordingStudioViewModel` to manage a 5-second countdown and teleprompter logic that displays 3 lines at a time and advances them to finish the script in 60 seconds. The `RecordingStudioScreen` should observe the active script from the ViewModel.
+- [x] **Agent Action**: When the recording is done, allow user to re-record. Also include navigation to go back (to Writer's Room) and forward (to Editing Studio).
+- [x] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 3: Recording Studio.
+- [x] **Agent Action**: Run `git add . && git commit -m "Phase 3: Recording Studio complete"`.
+- [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to track Phase 3 progress.
 - [ ] **Agent Action**: For the Editing Studio, allow the user to mark sections of the video for removal (e.g., where there was white space or where they made a mistake). Include a Save button that stares the modified video and a Restore button that returns the original video.
 - [ ] **Agent Action**: Include navigation for returning to the Editing Studio and advancing to the Publishing room.
 - [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 4: Editing Studio.

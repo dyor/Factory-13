@@ -29,8 +29,8 @@ Goal: Verify that the user can generate, fine-tune, edit, and persist a script u
 ## Journey 3: Recording Studio
 Goal: Verify that the user can record video using the front-facing camera while following the teleprompter.
 
-- [ ] **Agent Validation**: Verify ViewModel logic accurately manages the 5-second countdown timer and synchronizes the active script with the teleprompter advancement.
-- [ ] **User Validation**: Navigate to the Recording Studio. Confirm the top half displays the previously saved script and the bottom half shows the live front-facing camera view (with touch events disabled). Tap the Start button. Wait for the 5-second countdown, and verify the teleprompter advances 3 lines at a time until the target duration is met. When recording completes, confirm that navigation to go back (to Writer's Room) and forward (to Editing Studio) works.
+- [x] **Agent Validation**: Verify ViewModel logic accurately manages the 5-second countdown timer and synchronizes the active script with the teleprompter advancement.
+- [x] **User Validation**: Navigate to the Recording Studio. Confirm the top half displays the previously saved script and the bottom half shows the live front-facing camera view (with touch events disabled). Tap the Start button. Wait for the 5-second countdown, and verify the teleprompter advances 3 lines at a time until the target duration is met. When recording completes, confirm that navigation to go back (to Writer's Room) and forward (to Editing Studio) works.
 
 ## Journey 4: Editing Studio
 Goal: Verify that the user can precisely define sections of the recorded video to trim and recover.
