@@ -34,88 +34,128 @@ import org.example.project.ui.Screen
 import androidx.compose.runtime.saveable.rememberSerializable
 import androidx.savedstate.compose.serialization.serializers.SnapshotStateListSerializer
 
+import org.example.project.permissions.AppPermissionsHandler
+
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Image(
-                painter = painterResource(Res.drawable.film_noir),
-                contentDescription = "Background",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            
-            val backStack = rememberSerializable(serializer = SnapshotStateListSerializer()) {
-                mutableStateListOf<Screen>(Screen.Home)
-            }
-            val onBack = { if (backStack.size > 1) backStack.removeLast() }
-
-            Column(
-                modifier = Modifier
-                    .widthIn(max = 600.dp)
-                    .safeContentPadding()
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                NavDisplay(
-                    backStack = backStack,
-                    onBack = onBack,
-                    entryProvider = entryProvider {
-                        entry<Screen.Home> {
-                            Text("Home Screen Placeholder")
-                            Button(onClick = { backStack.add(Screen.WritersRoom) }) {
-                                Text("Go to Writers Room")
-                            }
-                            Button(onClick = { backStack.add(Screen.RecordingStudio) }) {
-                                Text("Go to Recording Studio")
-                            }
-                            Button(onClick = { backStack.add(Screen.EditingStudio) }) {
-                                Text("Go to Editing Studio")
-                            }
-                            Button(onClick = { backStack.add(Screen.PublishingStudio) }) {
-                                Text("Go to Publishing Studio")
-                            }
-                            Button(onClick = { backStack.add(Screen.Archives) }) {
-                                Text("Go to Archives")
-                            }
-                        }
-                        entry<Screen.WritersRoom> {
-                            Text("Writers Room Placeholder")
-                            Button(onClick = { onBack() }) {
-                                Text("Back to Home")
-                            }
-                        }
-                        entry<Screen.RecordingStudio> {
-                            Text("Recording Studio Placeholder")
-                            Button(onClick = { onBack() }) {
-                                Text("Back to Home")
-                            }
-                        }
-                        entry<Screen.EditingStudio> {
-                            Text("Editing Studio Placeholder")
-                            Button(onClick = { onBack() }) {
-                                Text("Back to Home")
-                            }
-                        }
-                        entry<Screen.PublishingStudio> {
-                            Text("Publishing Studio Placeholder")
-                            Button(onClick = { onBack() }) {
-                                Text("Back to Home")
-                            }
-                        }
-                        entry<Screen.Archives> {
-                            Text("Archives Placeholder")
-                            Button(onClick = { onBack() }) {
-                                Text("Back to Home")
-                            }
-                        }
-                    },
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator(),
-                    ),
+        AppPermissionsHandler {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(Res.drawable.film_noir),
+                    contentDescription = "Background",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
+                
+                val backStack = rememberSerializable(serializer = SnapshotStateListSerializer()) {
+                    mutableStateListOf<Screen>(Screen.Home)
+                }
+                val onBack = { if (backStack.size > 1) backStack.removeLast() }
+    
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 600.dp)
+                        .safeContentPadding()
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    NavDisplay(
+                        backStack = backStack,
+                        onBack = onBack,
+                        entryProvider = entryProvider {
+                            entry<Screen.Home> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Home Screen Placeholder")
+                                    Button(onClick = { backStack.add(Screen.WritersRoom) }) {
+                                        Text("Go to Writers Room")
+                                    }
+                                    Button(onClick = { backStack.add(Screen.RecordingStudio) }) {
+                                        Text("Go to Recording Studio")
+                                    }
+                                    Button(onClick = { backStack.add(Screen.EditingStudio) }) {
+                                        Text("Go to Editing Studio")
+                                    }
+                                    Button(onClick = { backStack.add(Screen.PublishingStudio) }) {
+                                        Text("Go to Publishing Studio")
+                                    }
+                                    Button(onClick = { backStack.add(Screen.Archives) }) {
+                                        Text("Go to Archives")
+                                    }
+                                }
+                            }
+                            entry<Screen.WritersRoom> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Writers Room Placeholder")
+                                    Button(onClick = { onBack() }) {
+                                        Text("Back to Home")
+                                    }
+                                }
+                            }
+                            entry<Screen.RecordingStudio> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Recording Studio Placeholder")
+                                    Button(onClick = { onBack() }) {
+                                        Text("Back to Home")
+                                    }
+                                }
+                            }
+                            entry<Screen.EditingStudio> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Editing Studio Placeholder")
+                                    Button(onClick = { onBack() }) {
+                                        Text("Back to Home")
+                                    }
+                                }
+                            }
+                            entry<Screen.PublishingStudio> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Publishing Studio Placeholder")
+                                    Button(onClick = { onBack() }) {
+                                        Text("Back to Home")
+                                    }
+                                }
+                            }
+                            entry<Screen.Archives> {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                                ) {
+                                    Text("Archives Placeholder")
+                                    Button(onClick = { onBack() }) {
+                                        Text("Back to Home")
+                                    }
+                                }
+                            }
+                        },
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator(),
+                        ),
+                    )
+                }
             }
         }
     }

@@ -51,7 +51,7 @@ Goal: Implement device-specific features (Camera, Audio, Location, etc.).
 
 ### Step 1: Permissions
 - [x] **Agent Action**: Configure cross-platform permission requests using `calf-permissions` (com.mohamedrejeb.calf:calf-permissions).
-- [ ] **User Action**: Confirm that permissions can be successfully requested and granted on Android and iOS.
+- [x] **User Action**: Confirm that permissions can be successfully requested and granted on Android and iOS.
 
 ### Step 2: Native Implementations
 ### Step 2.1: Gemini/Network and Room Implementation
