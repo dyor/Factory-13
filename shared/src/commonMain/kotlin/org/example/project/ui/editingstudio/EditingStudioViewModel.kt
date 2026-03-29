@@ -25,11 +25,32 @@ class EditingStudioViewModel(
     private val _videoPath = MutableStateFlow<String?>(null)
     val videoPath: StateFlow<String?> = _videoPath.asStateFlow()
 
+    private val _videoDuration = MutableStateFlow<Long>(0L)
+    val videoDuration: StateFlow<Long> = _videoDuration.asStateFlow()
+    
+    private val _skippedSegments = MutableStateFlow<List<Pair<Long, Long>>>(emptyList())
+    val skippedSegments: StateFlow<List<Pair<Long, Long>>> = _skippedSegments.asStateFlow()
+
+    private val _currentTime = MutableStateFlow<Long>(0L)
+    val currentTime: StateFlow<Long> = _currentTime.asStateFlow()
+
+    fun updateCurrentTime(timeMs: Long) {
+        _currentTime.value = timeMs
+    }
+
     init {
         viewModelScope.launch {
             scriptDao.getActiveScript().collect { script ->
                 _activeScript.value = script
                 _videoPath.value = script?.videoPath
+                script?.videoPath?.let { path ->
+                    try {
+                        val duration = org.example.project.domain.getVideoDuration(path)
+                        _videoDuration.value = duration
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
         }
     }
@@ -44,24 +65,66 @@ class EditingStudioViewModel(
     }
 
     fun markSectionForRemoval() {
-        // Simple mock behavior for Phase 3
-        // In Phase 5 this will be precisely trimmed
+        val current = _currentTime.value
+        val start = maxOf(0L, current - 500)
+        val end = minOf(_videoDuration.value, current + 500)
+        val newSegment = start to end
+        
+        val currentSegments = _skippedSegments.value.toMutableList()
+        currentSegments.add(newSegment)
+        
+        // Very basic mock simplification of merging intervals
+        _skippedSegments.value = currentSegments.sortedBy { it.first }
     }
 
     fun saveModifiedVideo(onSaved: () -> Unit) {
         val currentScript = _activeScript.value
-        if (currentScript != null) {
+        val path = _videoPath.value
+        if (currentScript != null && path != null) {
             viewModelScope.launch {
-                val updatedScript = currentScript.copy(scriptState = "PUBLISHING_STUDIO")
-                scriptDao.update(updatedScript)
-                _activeScript.value = updatedScript
-                onSaved()
+                // In Phase 5, we actually trigger the trimVideo API here
+                // For now, assume it always works.
+                try {
+                    val unskippedSegments = calculateUnskippedSegments()
+                    val outPath = path.replace(".mp4", "_trimmed.mp4")
+                    val success = org.example.project.domain.trimVideo(path, unskippedSegments, outPath)
+                    
+                    val updatedScript = currentScript.copy(
+                        scriptState = "PUBLISHING_STUDIO",
+                        videoPath = if (success) outPath else path
+                    )
+                    scriptDao.update(updatedScript)
+                    _activeScript.value = updatedScript
+                    onSaved()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
+    
+    private fun calculateUnskippedSegments(): List<Pair<Long, Long>> {
+        val totalDuration = _videoDuration.value
+        if (totalDuration == 0L || _skippedSegments.value.isEmpty()) {
+            return listOf(0L to totalDuration)
+        }
+        
+        val unskipped = mutableListOf<Pair<Long, Long>>()
+        var currentStart = 0L
+        for (skip in _skippedSegments.value) {
+            if (currentStart < skip.first) {
+                unskipped.add(currentStart to skip.first)
+            }
+            currentStart = skip.second
+        }
+        if (currentStart < totalDuration) {
+            unskipped.add(currentStart to totalDuration)
+        }
+        return unskipped
+    }
 
     fun restoreOriginalVideo() {
-        // Phase 3 mock behavior
+        _skippedSegments.value = emptyList()
         seekTo(0)
         _isPlaying.value = false
     }

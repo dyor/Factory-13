@@ -19,8 +19,8 @@ fun EditingStudioScreen(
     val isPlaying by viewModel.isPlaying.collectAsState()
     val seekRequest by viewModel.seekRequest.collectAsState()
     val videoPath by viewModel.videoPath.collectAsState()
-
-    var currentTime by remember { mutableStateOf(0L) }
+    val currentTime by viewModel.currentTime.collectAsState()
+    val videoDuration by viewModel.videoDuration.collectAsState()
 
     Column(
         modifier = Modifier
@@ -59,7 +59,7 @@ fun EditingStudioScreen(
                     videoPath = resolvedPath,
                     isPlaying = isPlaying,
                     seekRequest = seekRequest,
-                    onTimeUpdate = { currentTime = it },
+                    onTimeUpdate = { viewModel.updateCurrentTime(it) },
                     onCompletion = { 
                         if (isPlaying) {
                             viewModel.togglePlayPause() 
@@ -77,7 +77,7 @@ fun EditingStudioScreen(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Current Time: ${currentTime / 1000}s", color = MaterialTheme.colorScheme.onSurface)
+                Text("Current Time: ${currentTime / 1000}s / ${videoDuration / 1000}s", color = MaterialTheme.colorScheme.onSurface)
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
