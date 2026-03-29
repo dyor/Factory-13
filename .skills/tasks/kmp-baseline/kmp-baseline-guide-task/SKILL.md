@@ -81,34 +81,34 @@ Goal: Implement device-specific features (Camera, Audio, Location, etc.).
 - [ ] **Agent Action**: Implement "Go Back" functionality to revert an active script to a previous stage dynamically.
 - [ ] **Validation**: Ensure Active Script state management, dynamic Home screen navigation, archiving, and stage reversion works on Android and iOS.
 ### Step 2.2: YouTube Integration
-- [ ] **Agent Action**: Provide an option to publish the video on YouTube shorts. It is ok to use simple shortcuts - like saving this video to the native Photo app and opening YouTube (where the user can upload the video from their native Photo app). 
-- [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 5: Publishing Studio.
-- [ ] **Agent Action**: Run `git add . && git commit -m "Phase 3: Publishing Studio complete"`.
-- [ ] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 3 completion.
+- [x] **Agent Action**: Provide an option to publish the video on YouTube shorts. It is ok to use simple shortcuts - like saving this video to the native Photo app and opening YouTube (where the user can upload the video from their native Photo app). 
+- [x] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 5: Publishing Studio.
+- [x] **Agent Action**: Run `git add . && git commit -m "Phase 3: Publishing Studio complete"`.
+- [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 3 completion.
 
 ## Phase 4: The Final Cut (Cleanup & Optimization)
 Goal: Polish, optimize, and prepare for production.
 
-- [ ] **Agent Action**: Remove hardcoded values and mock data.
-- [ ] **Agent Action**: Enforce naming conventions and clean up resources.
-- [ ] **Agent Action**: Remove or minimize debug logging.
-- [ ] **User Action**: Final review of the application state.
-- [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to perform a full end-to-end regression validation.
-- [ ] **Agent Action**: Run `git add . && git commit -m "Phase 4: Final Cut"`.
-- [ ] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to track Phase 4 completion.
+- [x] **Agent Action**: Remove hardcoded values and mock data.
+- [x] **Agent Action**: Enforce naming conventions and clean up resources.
+- [x] **Agent Action**: Remove or minimize debug logging.
+- [x] **User Action**: Final review of the application state.
+- [x] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to perform a full end-to-end regression validation.
+- [x] **Agent Action**: Run `git add . && git commit -m "Phase 4: Final Cut"`.
+- [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to track Phase 4 completion.
 
 ## Phase 5: Factory-Specific Polish
 Goal: Refine the user experience with precise video editing, dynamic durations, and finalized branding.
 
-- [ ] **Agent Action**: Implement a Target Duration slider (5s to 60s) in the Writer's Room and update the Gemini prompt to strictly adhere to the selected duration. Update `Script` entity to store this duration.
-- [ ] **Agent Action**: Upgrade the VideoPlayer to support precise seeking (`seekRequest`) and playback state (`isPlaying`) across Android (`VideoView`) and iOS (`AVPlayerViewController`). Add `onTimeUpdate` and `onCompletion` callbacks.
-- [ ] **Agent Action**: Implement `resolveVideoPath` expect/actual to handle iOS Simulator UUID changes across rebuilds (searching `NSDocumentDirectory` and `NSTemporaryDirectory`).
+- [x] **Agent Action**: Implement a Target Duration slider (5s to 60s) in the Writer's Room and update the Gemini prompt to strictly adhere to the selected duration. Update `Script` entity to store this duration.
+- [x] **Agent Action**: Upgrade the VideoPlayer to support precise seeking (`seekRequest`) and playback state (`isPlaying`) across Android (`VideoView`) and iOS (`AVPlayerViewController`). Add `onTimeUpdate` and `onCompletion` callbacks.
+- [x] **Agent Action**: Implement `resolveVideoPath` expect/actual to handle iOS Simulator UUID changes across rebuilds (searching `NSDocumentDirectory` and `NSTemporaryDirectory`).
 - [ ] **Agent Action**: Refactor the Editing Studio timeline to dynamically generate exactly one block per second of the recorded video using `MediaMetadataRetriever` (Android) and `AVURLAsset` (iOS) to fetch the actual video duration.
 - [ ] **Agent Action**: Implement a "Fine-tune" modal in the Editing Studio allowing tenth-of-a-second skipping granularity (0.0s to 0.9s). Ensure it overlays cleanly at the bottom, auto-pauses the video when open, and seeks directly to the tapped tenth.
 - [ ] **Agent Action**: Add a "Preview without Skipped Frames" button that instantly seeks to the first unskipped tenth of a second and plays through, auto-skipping removed segments and reverting state upon completion.
 - [ ] **Agent Action**: Implement native `VideoTrimmer` (expect/actual) using Android `MediaExtractor`/`MediaMuxer` and iOS `AVMutableComposition` to trim and stitch unskipped tenths of a second into a final `_trimmed.mp4` file without heavy re-encoding. Ensure video rotation/transform metadata is preserved.
 - [ ] **Agent Action**: Standardize bottom navigation across all studio screens to have a consistent "Go Back" and "Go Home" row. Ensure correct back-stack popping logic.
-- [ ] **Agent Action**: Rebrand the app from "KotlinProject" to "The Factory" in Android (`strings.xml`) and iOS (`Info.plist`).
+- [x] **Agent Action**: Rebrand the app from "KotlinProject" to "The Factory" in Android (`strings.xml`) and iOS (`Info.plist`).
 - [ ] **Agent Action**: Update the iOS and Android app icons using the `film_noir.png` asset (e.g., using `sips` for macOS to generate `app-icon-1024.png`).
 - [ ] **Validation**: Execute `.skills/tasks/kmp-baseline/kmp-baseline-validation-task/SKILL.md` to validate Journey 6: Enhanced Editing and Polish.
 - [ ] **Agent Action**: Run `git add . && git commit -m "Phase 5: Polish complete"`.

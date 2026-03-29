@@ -16,9 +16,14 @@ object AppContainer {
 
     val geminiClient: GeminiClient by lazy { GeminiClient() }
 
-    fun init(builder: RoomDatabase.Builder<AppDatabase>) {
+    private var _context: Any? = null
+    val applicationContext: Any?
+        get() = _context
+
+    fun init(builder: RoomDatabase.Builder<AppDatabase>, context: Any? = null) {
         if (_database == null) {
             _database = getRoomDatabase(builder)
         }
+        _context = context
     }
 }

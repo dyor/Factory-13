@@ -26,19 +26,19 @@ Progress is calculated by evaluating the completed (`- [x]`) versus pending (`- 
 |-------|-------------|-----------|---------|--------------|
 | Phase 1: Foundation & Infrastructure | 16 | 16 | 0 | 100% |
 | Phase 2: Core Features & Logic | 8 | 8 | 0 | 100% |
-| Phase 3: Hardware / Native Integrations | 30 | 23 | 7 | 76.7% |
-| Phase 4: The Final Cut (Cleanup & Optimization) | 7 | 0 | 7 | 0% |
-| Phase 5: Factory-Specific Polish | 13 | 0 | 13 | 0% |
+| Phase 3: Hardware / Native Integrations | 30 | 30 | 0 | 100% |
+| Phase 4: The Final Cut (Cleanup & Optimization) | 7 | 7 | 0 | 100% |
+| Phase 5: Factory-Specific Polish | 13 | 4 | 9 | 30.7% |
 
 ## Actionable Insights
-*   **Current Phase:** Phase 3: Hardware / Native Integrations
-*   **Next Task:** `- [ ] **Agent Action**: Implement Active Script state management and dynamic Home screen navigation. Update the \`Script\` entity to store the \`scriptState\` (e.g. \`WRITERS_ROOM\`, \`RECORDING_STUDIO\`, etc.).`
-*   **Pending Breakdown:** 1 User Actions, 22 Agent Actions, 5 Validations remaining.
+*   **Current Phase:** Phase 5: Factory-Specific Polish
+*   **Next Task:** `- [ ] **Agent Action**: Refactor the Editing Studio timeline to dynamically generate exactly one block per second of the recorded video using \`MediaMetadataRetriever\` (Android) and \`AVURLAsset\` (iOS) to fetch the actual video duration.`
+*   **Pending Breakdown:** 0 User Actions, 8 Agent Actions, 1 Validations remaining.
 
 ---
 
 ## Overall Project Progress
 *   **Total Tasks**: 74
-*   **Completed Tasks**: 47
-*   **Pending Tasks**: 27
-*   **Overall Completion**: 63.5%
+*   **Completed Tasks**: 65
+*   **Pending Tasks**: 9
+*   **Overall Completion**: 87.8%

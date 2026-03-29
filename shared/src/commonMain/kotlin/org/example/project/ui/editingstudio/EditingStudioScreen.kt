@@ -79,15 +79,20 @@ fun EditingStudioScreen(
             ) {
                 Text("Current Time: ${currentTime / 1000}s", color = MaterialTheme.colorScheme.onSurface)
                 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Button(onClick = { viewModel.togglePlayPause() }) {
-                        Text(if (isPlaying) "Pause" else "Play")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(onClick = { viewModel.togglePlayPause() }, modifier = Modifier.weight(1f)) {
+                        Text(if (isPlaying) "Pause" else "Play", maxLines = 1)
                     }
-                    Button(onClick = { viewModel.markSectionForRemoval() }) {
-                        Text("Mark for Removal")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = { viewModel.markSectionForRemoval() }, modifier = Modifier.weight(1.5f)) {
+                        Text("Remove", maxLines = 1)
                     }
-                    Button(onClick = { viewModel.restoreOriginalVideo() }) {
-                        Text("Restore")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = { viewModel.restoreOriginalVideo() }, modifier = Modifier.weight(1f)) {
+                        Text("Restore", maxLines = 1)
                     }
                 }
 

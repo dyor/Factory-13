@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         
-        AppContainer.init(getDatabaseBuilder(this))
+        AppContainer.init(getDatabaseBuilder(this), this.applicationContext)
 
         setContent {
             App()

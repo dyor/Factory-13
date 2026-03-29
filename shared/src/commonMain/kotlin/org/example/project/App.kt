@@ -46,6 +46,12 @@ import org.example.project.ui.recordingstudio.RecordingStudioViewModel
 import org.example.project.ui.editingstudio.EditingStudioScreen
 import org.example.project.ui.editingstudio.EditingStudioViewModel
 
+import org.example.project.ui.home.HomeScreen
+import org.example.project.ui.home.HomeViewModel
+
+import org.example.project.ui.publishingstudio.PublishingStudioScreen
+import org.example.project.ui.publishingstudio.PublishingStudioViewModel
+
 @Composable
 @Preview
 fun App() {
@@ -76,28 +82,17 @@ fun App() {
                         onBack = onBack,
                         entryProvider = entryProvider {
                             entry<Screen.Home> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Home Screen Placeholder")
-                                    Button(onClick = { backStack.add(Screen.WritersRoom) }) {
-                                        Text("Go to Writers Room")
-                                    }
-                                    Button(onClick = { backStack.add(Screen.RecordingStudio) }) {
-                                        Text("Go to Recording Studio")
-                                    }
-                                    Button(onClick = { backStack.add(Screen.EditingStudio) }) {
-                                        Text("Go to Editing Studio")
-                                    }
-                                    Button(onClick = { backStack.add(Screen.PublishingStudio) }) {
-                                        Text("Go to Publishing Studio")
-                                    }
-                                    Button(onClick = { backStack.add(Screen.Archives) }) {
-                                        Text("Go to Archives")
-                                    }
+                                val homeViewModel = remember {
+                                    HomeViewModel(scriptDao = AppContainer.scriptDao)
                                 }
+                                HomeScreen(
+                                    viewModel = homeViewModel,
+                                    onNavigateToWritersRoom = { backStack.add(Screen.WritersRoom) },
+                                    onNavigateToRecordingStudio = { backStack.add(Screen.RecordingStudio) },
+                                    onNavigateToEditingStudio = { backStack.add(Screen.EditingStudio) },
+                                    onNavigateToPublishingStudio = { backStack.add(Screen.PublishingStudio) },
+                                    onNavigateToArchives = { backStack.add(Screen.Archives) }
+                                )
                             }
                             entry<Screen.WritersRoom> {
                                 val viewModel = remember { 
@@ -133,16 +128,17 @@ fun App() {
                                 )
                             }
                             entry<Screen.PublishingStudio> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Publishing Studio Placeholder")
-                                    Button(onClick = { onBack() }) {
-                                        Text("Back to Home")
-                                    }
+                                val publishingViewModel = remember {
+                                    PublishingStudioViewModel(scriptDao = AppContainer.scriptDao)
                                 }
+                                PublishingStudioScreen(
+                                    viewModel = publishingViewModel,
+                                    onNavigateBack = onBack,
+                                    onNavigateHome = { 
+                                        backStack.clear()
+                                        backStack.add(Screen.Home)
+                                    }
+                                )
                             }
                             entry<Screen.Archives> {
                                 Column(
