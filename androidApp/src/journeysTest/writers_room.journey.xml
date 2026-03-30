@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<journey name="Writer's Room">
+    <description>Verify that the user can generate, fine-tune, edit, and persist a strictly formatted script.</description>
+    <actions xml:space="preserve">
+        <action>Tap 'Start New Video' or 'Continue' to navigate to the Writer's Room.</action>
+        <action>Use the slider to select a target duration.</action>
+        <action>Tap 'Generate Script' and wait for the generated script to appear on screen.</action>
+        <action>Check that the generated text contains duration timestamps like '0s-5s' without conversational filler.</action>
+        <action>Edit a portion of the generated script text.</action>
+        <action>Tap 'Save Script' to persist it.</action>
+        <action>Tap 'Go to Recording Studio' to verify navigation to the next stage.</action>
+    </actions>
+</journey>

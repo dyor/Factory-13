@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<journey name="Recording Studio">
+    <description>Verify that the user can record video using the front-facing camera while following the teleprompter.</description>
+    <actions xml:space="preserve">
+        <action>Ensure that the top half of the screen displays the previously saved script.</action>
+        <action>Check that the bottom half of the screen shows the live front-facing camera view.</action>
+        <action>Tap 'Start Recording' to begin.</action>
+        <action>Wait for the 5-second countdown to finish.</action>
+        <action>Verify that the teleprompter advances correctly based on the target duration timestamps.</action>
+        <action>Check that two counters exist counting down the remaining time for the current caption and the entire video.</action>
+        <action>When recording completes, verify that navigation options 'Go Back' and 'Proceed to Editing Studio' appear.</action>
+        <action>Tap 'Proceed to Editing Studio' to advance to the next screen.</action>
+    </actions>
+</journey>

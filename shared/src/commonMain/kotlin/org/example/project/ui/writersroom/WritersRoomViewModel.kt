@@ -28,7 +28,20 @@ class WritersRoomViewModel(
         viewModelScope.launch {
             _isGenerating.value = true
             try {
-                val script = geminiClient.generateScript(targetDurationSeconds = _targetDuration.value)
+                val prompt = "Write a script for YouTube short that is designed to teach people how to create compelling YouTube shorts. It should take exactly ${_targetDuration.value} seconds to read aloud at a normal pace. ONLY return the text to be spoken and the timestamp range it is spoken in, using the format '0s-5s: Hello...'. Do not include any conversational filler, markdown formatting, explanations, or background info."
+                
+                val request = org.example.project.domain.gemini.GeminiRequest(
+                    contents = listOf(
+                        org.example.project.domain.gemini.Content(
+                            parts = listOf(org.example.project.domain.gemini.Part(text = prompt))
+                        )
+                    )
+                )
+
+                // We're dynamically constructing the request here since GeminiClient originally hardcoded it
+                // Actually, wait, GeminiClient has the hardcoded prompt inside its generateScript method.
+                // Let's pass the prompt to GeminiClient.
+                val script = geminiClient.generateScript(prompt = prompt)
                 _generatedScript.value = script
             } catch (e: Exception) {
                 _generatedScript.value = "Error generating script: ${e.message}"

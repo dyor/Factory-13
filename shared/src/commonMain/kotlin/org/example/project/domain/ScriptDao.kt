@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,6 +27,12 @@ interface ScriptDao {
     @Query("UPDATE script SET isActive = 0")
     suspend fun clearActiveScript()
 
+    @Transaction
+    suspend fun setActiveScript(id: Long) {
+        clearActiveScript()
+        setActiveScriptById(id)
+    }
+
     @Query("UPDATE script SET isActive = 1 WHERE id = :id")
-    suspend fun setActiveScript(id: Long)
+    suspend fun setActiveScriptById(id: Long)
 }

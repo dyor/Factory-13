@@ -52,6 +52,9 @@ import org.example.project.ui.home.HomeViewModel
 import org.example.project.ui.publishingstudio.PublishingStudioScreen
 import org.example.project.ui.publishingstudio.PublishingStudioViewModel
 
+import org.example.project.ui.archives.ArchivesScreen
+import org.example.project.ui.archives.ArchivesViewModel
+
 @Composable
 @Preview
 fun App() {
@@ -141,16 +144,23 @@ fun App() {
                                 )
                             }
                             entry<Screen.Archives> {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-                                ) {
-                                    Text("Archives Placeholder")
-                                    Button(onClick = { onBack() }) {
-                                        Text("Back to Home")
-                                    }
+                                val archivesViewModel = remember {
+                                    ArchivesViewModel(scriptDao = AppContainer.scriptDao)
                                 }
+                                ArchivesScreen(
+                                    viewModel = archivesViewModel,
+                                    onNavigateBack = onBack,
+                                    onNavigateToStudio = { state ->
+                                        backStack.clear()
+                                        backStack.add(Screen.Home)
+                                        when (state) {
+                                            "WRITERS_ROOM" -> backStack.add(Screen.WritersRoom)
+                                            "RECORDING_STUDIO" -> backStack.add(Screen.RecordingStudio)
+                                            "EDITING_STUDIO" -> backStack.add(Screen.EditingStudio)
+                                            "PUBLISHING_STUDIO" -> backStack.add(Screen.PublishingStudio)
+                                        }
+                                    }
+                                )
                             }
                         },
                         entryDecorators = listOf(

@@ -52,20 +52,28 @@ fun PermissionRequestScreen(
     ) {
         when {
             cameraPermissionState.status != PermissionStatus.Granted -> {
+                LaunchedEffect(Unit) {
+                    cameraPermissionState.launchPermissionRequest()
+                }
                 // Request Camera permission first
                 Text("Camera permission required.")
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                    Text("Request Camera")
+                    Text("Request Camera Manually")
                 }
+                Text("(If this button does nothing, please enable permissions in Android App Settings)", style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
             recordAudioPermissionState.status != PermissionStatus.Granted -> {
+                LaunchedEffect(Unit) {
+                    recordAudioPermissionState.launchPermissionRequest()
+                }
                 // Request Record Audio permission next
                 Text("Microphone permission required.")
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = { recordAudioPermissionState.launchPermissionRequest() }) {
-                    Text("Request Microphone")
+                    Text("Request Microphone Manually")
                 }
+                Text("(If this button does nothing, please enable permissions in Android App Settings)", style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
             else -> {
                 // All permissions granted, show content

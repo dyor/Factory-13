@@ -11,6 +11,12 @@ import kotlinx.coroutines.launch
 import org.example.project.domain.Script
 import org.example.project.domain.ScriptDao
 
+data class ScriptSegment(
+    val startTimeSec: Int,
+    val endTimeSec: Int,
+    val text: String
+)
+
 class RecordingStudioViewModel(
     private val scriptDao: ScriptDao
 ) : ViewModel() {
@@ -30,11 +36,19 @@ class RecordingStudioViewModel(
     private val _isCountingDown = MutableStateFlow(false)
     val isCountingDown: StateFlow<Boolean> = _isCountingDown.asStateFlow()
 
-    private val _visibleLines = MutableStateFlow<List<String>>(emptyList())
-    val visibleLines: StateFlow<List<String>> = _visibleLines.asStateFlow()
+    private val _currentSegmentText = MutableStateFlow("")
+    val currentSegmentText: StateFlow<String> = _currentSegmentText.asStateFlow()
 
-    private var allLines: List<String> = emptyList()
-    private var currentLineIndex = 0
+    private val _totalTimeRemainingSec = MutableStateFlow(0)
+    val totalTimeRemainingSec: StateFlow<Int> = _totalTimeRemainingSec.asStateFlow()
+
+    private val _segmentTimeRemainingSec = MutableStateFlow(0)
+    val segmentTimeRemainingSec: StateFlow<Int> = _segmentTimeRemainingSec.asStateFlow()
+
+    private val _segmentProgress = MutableStateFlow(0f)
+    val segmentProgress: StateFlow<Float> = _segmentProgress.asStateFlow()
+
+    private var segments: List<ScriptSegment> = emptyList()
     private var teleprompterJob: Job? = null
 
     init {
@@ -42,11 +56,39 @@ class RecordingStudioViewModel(
             scriptDao.getActiveScript().collect { script ->
                 _activeScript.value = script
                 if (script != null) {
-                    allLines = script.content.split("\n").filter { it.isNotBlank() }
-                    updateVisibleLines()
+                    segments = parseScript(script.content)
+                    if (segments.isNotEmpty()) {
+                        _currentSegmentText.value = segments.first().text
+                        _totalTimeRemainingSec.value = segments.last().endTimeSec
+                        val firstSeg = segments.first()
+                        _segmentTimeRemainingSec.value = firstSeg.endTimeSec - firstSeg.startTimeSec
+                        _segmentProgress.value = 0f
+                    }
                 }
             }
         }
+    }
+
+    private fun parseScript(content: String): List<ScriptSegment> {
+        val regex = Regex("""^(\d+)s-(\d+)s:?\s*(.*)$""")
+        val lines = content.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+        val parsedSegments = mutableListOf<ScriptSegment>()
+        
+        var fallbackTime = 0
+        for (line in lines) {
+            val match = regex.find(line)
+            if (match != null) {
+                val start = match.groupValues[1].toInt()
+                val end = match.groupValues[2].toInt()
+                val text = match.groupValues[3]
+                parsedSegments.add(ScriptSegment(start, end, text))
+                fallbackTime = end
+            } else {
+                parsedSegments.add(ScriptSegment(fallbackTime, fallbackTime + 5, line))
+                fallbackTime += 5
+            }
+        }
+        return parsedSegments
     }
 
     fun startRecordingProcess() {
@@ -72,33 +114,52 @@ class RecordingStudioViewModel(
         _isRecording.value = false
         _isFinished.value = true
         teleprompterJob?.cancel()
-        currentLineIndex = 0
-        updateVisibleLines()
     }
 
     private fun startTeleprompter() {
         teleprompterJob?.cancel()
         
-        val targetDuration = _activeScript.value?.targetDuration ?: 15
-        val totalLines = allLines.size
-        
-        if (totalLines == 0) return
-        
-        val timePerLineMs = (targetDuration * 1000L) / totalLines
+        if (segments.isEmpty()) {
+            stopRecording()
+            return
+        }
+
+        val totalDurationMs = segments.last().endTimeSec * 1000L
 
         teleprompterJob = viewModelScope.launch {
-            while (currentLineIndex < totalLines) {
-                updateVisibleLines()
-                delay(timePerLineMs)
-                currentLineIndex++
+            var elapsedMs = 0L
+            val tickMs = 100L
+
+            while (elapsedMs <= totalDurationMs) {
+                val currentSec = (elapsedMs / 1000).toInt()
+                
+                // Find current segment
+                val currentSeg = segments.firstOrNull { currentSec >= it.startTimeSec && currentSec < it.endTimeSec } 
+                    ?: segments.lastOrNull { currentSec >= it.endTimeSec }
+                    ?: segments.last()
+
+                _currentSegmentText.value = currentSeg.text
+                
+                val totalRemaining = maxOf(0, (totalDurationMs - elapsedMs) / 1000).toInt()
+                _totalTimeRemainingSec.value = totalRemaining
+
+                val segDurationMs = (currentSeg.endTimeSec - currentSeg.startTimeSec) * 1000L
+                val segElapsedMs = elapsedMs - (currentSeg.startTimeSec * 1000L)
+                val segRemainingMs = maxOf(0L, segDurationMs - segElapsedMs)
+                
+                _segmentTimeRemainingSec.value = (segRemainingMs / 1000).toInt()
+                
+                _segmentProgress.value = if (segDurationMs > 0) {
+                    (segElapsedMs.toFloat() / segDurationMs.toFloat()).coerceIn(0f, 1f)
+                } else {
+                    1f
+                }
+
+                delay(tickMs)
+                elapsedMs += tickMs
             }
             stopRecording()
         }
-    }
-
-    private fun updateVisibleLines() {
-        val endIndex = minOf(currentLineIndex + 3, allLines.size)
-        _visibleLines.value = allLines.subList(currentLineIndex, endIndex)
     }
 
     fun onVideoRecorded(filePath: String) {
@@ -112,13 +173,29 @@ class RecordingStudioViewModel(
         }
     }
 
+    fun archiveScript() {
+        val currentScript = _activeScript.value
+        if (currentScript != null) {
+            viewModelScope.launch {
+                val updatedScript = currentScript.copy(scriptState = "ARCHIVED")
+                scriptDao.update(updatedScript)
+                _activeScript.value = null
+            }
+        }
+    }
+
     fun reset() {
         _isRecording.value = false
         _isFinished.value = false
         _isCountingDown.value = false
         _countdown.value = 5
-        currentLineIndex = 0
         teleprompterJob?.cancel()
-        updateVisibleLines()
+        if (segments.isNotEmpty()) {
+            _currentSegmentText.value = segments.first().text
+            _totalTimeRemainingSec.value = segments.last().endTimeSec
+            val firstSeg = segments.first()
+            _segmentTimeRemainingSec.value = firstSeg.endTimeSec - firstSeg.startTimeSec
+            _segmentProgress.value = 0f
+        }
     }
 }

@@ -41,8 +41,7 @@ class GeminiClient {
         }
     }
 
-    suspend fun generateScript(targetDurationSeconds: Int = 15): String {
-        val prompt = "Write a script for YouTube short that is designed to teach people how to create compelling YouTube shorts. It should take exactly $targetDurationSeconds seconds to read aloud at a normal pace."
+    suspend fun generateScript(prompt: String): String {
         val apiKey = BuildConfig.GEMINI_API_KEY
         
         if (apiKey.isEmpty() || apiKey == "null") {

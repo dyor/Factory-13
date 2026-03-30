@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<journey name="Archives">
+    <description>Verify that users can see past projects and restore an archived project to active status.</description>
+    <actions>
+        <action>Tap 'Archives' from the Home Screen.</action>
+        <action>Confirm that previously archived videos or scripts appear in a list.</action>
+        <action>Tap on an archived video card.</action>
+        <action>Verify that the selected project becomes the Active Project and the app returns to the appropriate room to resume editing.</action>
+    </actions>
+</journey>
