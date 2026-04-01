@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <journey name="Editing Studio">
     <description>Verify that the user can precisely define sections of the recorded video to trim and recover.</description>
-    <actions>
+    <actions xml:space="preserve">
         <action>Verify that the timeline scaling and metadata generation correctly load the local file path.</action>
         <action>Open the 'Fine-tune' modal to adjust playback blocks.</action>
         <action>Verify that you can adjust playback blocks in tenth-of-a-second increments from 0.0s to 0.9s.</action>

@@ -13,6 +13,7 @@ import platform.AVKit.AVPlayerViewController
 import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSURL
 import platform.UIKit.UIView
+import platform.AVFAudio.*
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
@@ -32,6 +33,15 @@ actual fun VideoPlayer(
             val url = NSURL.fileURLWithPath(videoPath)
             val playerItem = AVPlayerItem(uRL = url)
             player.replaceCurrentItemWithPlayerItem(playerItem)
+            
+            // Ensure audio plays even if the physical switch is set to silent
+            val audioSession = AVAudioSession.sharedInstance()
+            try {
+                audioSession.setCategory(AVAudioSessionCategoryPlayback, null)
+                audioSession.setActive(true, null)
+            } catch (e: Exception) {
+                println("Failed to set audio session category: ${e.message}")
+            }
         }
     }
 
@@ -60,6 +70,12 @@ actual fun VideoPlayer(
                 val seconds = time.useContents { value.toDouble() / timescale.toDouble() }
                 onTimeUpdate((seconds * 1000).toLong())
             }
+        }
+    }
+
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose {
+            player.pause()
         }
     }
 

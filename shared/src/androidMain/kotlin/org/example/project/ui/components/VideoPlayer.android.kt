@@ -23,7 +23,8 @@ actual fun VideoPlayer(
     LaunchedEffect(videoPath) {
         if (videoPath.isNotBlank()) {
             videoView.setVideoURI(Uri.parse(videoPath))
-            videoView.setOnPreparedListener {
+            videoView.setOnPreparedListener { mp ->
+                mp.setVolume(1f, 1f) // Ensure audio is playing
                 if (isPlaying) videoView.start()
             }
         }
@@ -50,6 +51,12 @@ actual fun VideoPlayer(
             if (videoView.isPlaying) {
                 onTimeUpdate(videoView.currentPosition.toLong())
             }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            videoView.stopPlayback()
         }
     }
 

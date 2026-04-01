@@ -1,17 +1,26 @@
 package org.example.project.ui.archives
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import org.example.project.domain.Script
 
 @Composable
@@ -21,6 +30,7 @@ fun ArchivesScreen(
     onNavigateToStudio: (String) -> Unit
 ) {
     val archivedScripts by viewModel.archivedScripts.collectAsState()
+    var selectedScript by remember { mutableStateOf<Script?>(null) }
 
     Column(
         modifier = Modifier
@@ -30,26 +40,31 @@ fun ArchivesScreen(
     ) {
         Text(
             text = "Archives",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+            color = Color(0xFFFFD700), // Gold for Noir theme
+            modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                .padding(horizontal = 24.dp, vertical = 12.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (archivedScripts.isEmpty()) {
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                Text("No archived projects found.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No archived projects found.", color = Color.Gray, fontSize = 18.sp)
             }
         } else {
             LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 items(archivedScripts) { script ->
                     ArchiveItemCard(
                         script = script,
-                        onClick = {
-                            viewModel.makeScriptActive(script) { state ->
-                                onNavigateToStudio(state)
-                            }
-                        }
+                        onClick = { selectedScript = script }
                     )
                 }
             }
@@ -57,32 +72,84 @@ fun ArchivesScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = onNavigateBack, modifier = Modifier.fillMaxWidth()) {
-            Text("Back to Home")
+        OutlinedButton(
+            onClick = onNavigateBack, 
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
+            border = BorderStroke(1.dp, Color(0xFFFFD700))
+        ) {
+            Text("← Home", fontSize = 16.sp)
         }
+    }
+
+    selectedScript?.let { script ->
+        AlertDialog(
+            onDismissRequest = { selectedScript = null },
+            title = { Text("Restore Project") },
+            text = { Text("Where would you like to resume this project? \n\nRestoring to the Writer's Room will keep your recorded video unless you generate a new script.", color = Color.LightGray) },
+            confirmButton = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.makeScriptActive(script) {
+                                onNavigateToStudio("WRITERS_ROOM")
+                            }
+                            selectedScript = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
+                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                    ) {
+                        Text("Restore to Writer's Room")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.makeScriptActive(script) { state ->
+                                onNavigateToStudio(state)
+                            }
+                            selectedScript = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        border = BorderStroke(1.dp, Color.White)
+                    ) {
+                        Text("Restore to Last Stage")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedScript = null }) { Text("Cancel", color = Color.Gray) }
+            },
+            containerColor = Color(0xFF222222),
+            titleContentColor = Color(0xFFFFD700)
+        )
     }
 }
 
 @Composable
 fun ArchiveItemCard(script: Script, onClick: () -> Unit) {
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(16.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
             Text(
                 text = script.title,
                 style = MaterialTheme.typography.titleMedium,
+                color = Color(0xFFFFD700),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Last Stage: ${script.scriptState.replace("_", " ")}",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.LightGray
             )
         }
     }

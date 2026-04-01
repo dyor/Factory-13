@@ -48,7 +48,12 @@ class RecordingStudioViewModel(
     private val _segmentProgress = MutableStateFlow(0f)
     val segmentProgress: StateFlow<Float> = _segmentProgress.asStateFlow()
 
-    private var segments: List<ScriptSegment> = emptyList()
+    private val _totalProgress = MutableStateFlow(0f)
+    val totalProgress: StateFlow<Float> = _totalProgress.asStateFlow()
+
+    private val _segments = MutableStateFlow<List<ScriptSegment>>(emptyList())
+    val segments: StateFlow<List<ScriptSegment>> = _segments.asStateFlow()
+
     private var teleprompterJob: Job? = null
 
     init {
@@ -56,13 +61,15 @@ class RecordingStudioViewModel(
             scriptDao.getActiveScript().collect { script ->
                 _activeScript.value = script
                 if (script != null) {
-                    segments = parseScript(script.content)
-                    if (segments.isNotEmpty()) {
-                        _currentSegmentText.value = segments.first().text
-                        _totalTimeRemainingSec.value = segments.last().endTimeSec
-                        val firstSeg = segments.first()
+                    val parsed = parseScript(script.content)
+                    _segments.value = parsed
+                    if (parsed.isNotEmpty()) {
+                        _currentSegmentText.value = parsed.first().text
+                        _totalTimeRemainingSec.value = parsed.last().endTimeSec
+                        val firstSeg = parsed.first()
                         _segmentTimeRemainingSec.value = firstSeg.endTimeSec - firstSeg.startTimeSec
                         _segmentProgress.value = 0f
+                        _totalProgress.value = 0f
                     }
                 }
             }
@@ -91,6 +98,8 @@ class RecordingStudioViewModel(
         return parsedSegments
     }
 
+    private var actualElapsedMs = 0L // Keep track of actual recorded time
+
     fun startRecordingProcess() {
         if (_activeScript.value == null) return
         
@@ -98,6 +107,7 @@ class RecordingStudioViewModel(
             _isFinished.value = false
             _isCountingDown.value = true
             _countdown.value = 5
+            actualElapsedMs = 0L
             
             while (_countdown.value > 0) {
                 delay(1000)
@@ -114,37 +124,54 @@ class RecordingStudioViewModel(
         _isRecording.value = false
         _isFinished.value = true
         teleprompterJob?.cancel()
+        
+        val actualSecs = (actualElapsedMs + 999) / 1000
+        val currentScript = _activeScript.value
+        if (currentScript != null && actualSecs > 0) {
+             viewModelScope.launch {
+                 val updated = currentScript.copy(targetDuration = actualSecs.toInt())
+                 scriptDao.update(updated)
+                 _activeScript.value = updated
+             }
+        }
     }
 
     private fun startTeleprompter() {
         teleprompterJob?.cancel()
         
-        if (segments.isEmpty()) {
+        val currentSegments = segments.value
+        if (currentSegments.isEmpty()) {
             stopRecording()
             return
         }
 
-        val totalDurationMs = segments.last().endTimeSec * 1000L
+        val totalDurationMs = (currentSegments.last().endTimeSec + 2) * 1000L // Add 2 seconds buffer
 
         teleprompterJob = viewModelScope.launch {
-            var elapsedMs = 0L
+            actualElapsedMs = 0L
             val tickMs = 100L
 
-            while (elapsedMs <= totalDurationMs) {
-                val currentSec = (elapsedMs / 1000).toInt()
+            while (actualElapsedMs <= totalDurationMs) {
+                val currentSec = (actualElapsedMs / 1000).toInt()
                 
                 // Find current segment
-                val currentSeg = segments.firstOrNull { currentSec >= it.startTimeSec && currentSec < it.endTimeSec } 
-                    ?: segments.lastOrNull { currentSec >= it.endTimeSec }
-                    ?: segments.last()
+                val currentSeg = currentSegments.firstOrNull { currentSec >= it.startTimeSec && currentSec < it.endTimeSec } 
+                    ?: currentSegments.lastOrNull { currentSec >= it.endTimeSec }
+                    ?: currentSegments.last() // Fallback to last segment if outside defined ranges
 
                 _currentSegmentText.value = currentSeg.text
                 
-                val totalRemaining = maxOf(0, (totalDurationMs - elapsedMs) / 1000).toInt()
+                val totalRemaining = maxOf(0L, (totalDurationMs - actualElapsedMs) / 1000).toInt()
                 _totalTimeRemainingSec.value = totalRemaining
 
+                _totalProgress.value = if (totalDurationMs > 0) {
+                    (actualElapsedMs.toFloat() / totalDurationMs.toFloat()).coerceIn(0f, 1f)
+                } else {
+                    1f
+                }
+
                 val segDurationMs = (currentSeg.endTimeSec - currentSeg.startTimeSec) * 1000L
-                val segElapsedMs = elapsedMs - (currentSeg.startTimeSec * 1000L)
+                val segElapsedMs = actualElapsedMs - (currentSeg.startTimeSec * 1000L)
                 val segRemainingMs = maxOf(0L, segDurationMs - segElapsedMs)
                 
                 _segmentTimeRemainingSec.value = (segRemainingMs / 1000).toInt()
@@ -156,7 +183,7 @@ class RecordingStudioViewModel(
                 }
 
                 delay(tickMs)
-                elapsedMs += tickMs
+                actualElapsedMs += tickMs
             }
             stopRecording()
         }
@@ -166,7 +193,11 @@ class RecordingStudioViewModel(
         val currentScript = _activeScript.value
         if (currentScript != null) {
             viewModelScope.launch {
-                val updatedScript = currentScript.copy(videoPath = filePath, scriptState = "RECORDING_STUDIO")
+                val updatedScript = currentScript.copy(
+                    videoPath = filePath, 
+                    scriptState = "RECORDING_STUDIO",
+                    skippedSegmentsJson = ""
+                )
                 scriptDao.update(updatedScript)
                 _activeScript.value = updatedScript
             }
@@ -185,17 +216,28 @@ class RecordingStudioViewModel(
     }
 
     fun reset() {
+        viewModelScope.launch {
+            val currentScript = _activeScript.value
+            if (currentScript != null) {
+                val updatedScript = currentScript.copy(videoPath = null, scriptState = "WRITERS_ROOM")
+                scriptDao.update(updatedScript)
+                _activeScript.value = updatedScript // Update the flow to reflect the change immediately
+            }
+        }
+
         _isRecording.value = false
         _isFinished.value = false
         _isCountingDown.value = false
         _countdown.value = 5
         teleprompterJob?.cancel()
-        if (segments.isNotEmpty()) {
-            _currentSegmentText.value = segments.first().text
-            _totalTimeRemainingSec.value = segments.last().endTimeSec
-            val firstSeg = segments.first()
+        val currentSegments = segments.value
+        if (currentSegments.isNotEmpty()) {
+            _currentSegmentText.value = currentSegments.first().text
+            _totalTimeRemainingSec.value = currentSegments.last().endTimeSec
+            val firstSeg = currentSegments.first()
             _segmentTimeRemainingSec.value = firstSeg.endTimeSec - firstSeg.startTimeSec
             _segmentProgress.value = 0f
+            _totalProgress.value = 0f
         }
     }
 }

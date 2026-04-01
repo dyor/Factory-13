@@ -12,8 +12,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,9 +48,8 @@ fun RecordingStudioScreen(
     val countdown by viewModel.countdown.collectAsState()
     
     val currentSegmentText by viewModel.currentSegmentText.collectAsState()
-    val totalTimeRemainingSec by viewModel.totalTimeRemainingSec.collectAsState()
-    val segmentTimeRemainingSec by viewModel.segmentTimeRemainingSec.collectAsState()
-    val segmentProgress by viewModel.segmentProgress.collectAsState()
+    val totalProgress by viewModel.totalProgress.collectAsState()
+    val segments by viewModel.segments.collectAsState()
 
     var showReRecordDialog by remember { mutableStateOf(false) }
     var showArchiveDialog by remember { mutableStateOf(false) }
@@ -125,56 +128,76 @@ fun RecordingStudioScreen(
                             .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                             .padding(16.dp)
                     ) {
-                        // Total time remaining
-                        Text(
-                            text = "Total Time Left: ${totalTimeRemainingSec}s",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        
+                        // Custom segment progress bar
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(24.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            val canvasWidth = size.width
+                            val canvasHeight = size.height
+                            val barHeight = 12.dp.toPx()
+                            val barY = canvasHeight / 2f
+                            
+                            val segmentColors = listOf(
+                                Color(0xFFFF5252), // Red
+                                Color(0xFFFFD54F), // Yellow
+                                Color(0xFF81C784), // Green
+                                Color(0xFF64B5F6), // Blue
+                                Color(0xFFBA68C8)  // Purple
+                            )
+                            
+                            if (segments.isNotEmpty()) {
+                                val totalVideoTime = segments.last().endTimeSec
+                                var currentStartX = 0f
+                                
+                                // Draw segments
+                                segments.forEachIndexed { index, seg ->
+                                    val segDuration = seg.endTimeSec - seg.startTimeSec
+                                    val segWidth = (segDuration.toFloat() / totalVideoTime.toFloat()) * canvasWidth
+                                    val color = segmentColors[index % segmentColors.size]
+                                    
+                                    drawLine(
+                                        color = color,
+                                        start = Offset(currentStartX, barY),
+                                        end = Offset(currentStartX + segWidth, barY),
+                                        strokeWidth = barHeight,
+                                        cap = StrokeCap.Round
+                                    )
+                                    currentStartX += segWidth
+                                }
+                                
+                                // Draw ball
+                                val ballX = canvasWidth * totalProgress
+                                drawCircle(
+                                    color = Color.White,
+                                    radius = barHeight, // Ball is slightly larger than bar
+                                    center = Offset(ballX, barY)
+                                )
+                                drawCircle(
+                                    color = Color.Black,
+                                    radius = barHeight * 0.8f,
+                                    center = Offset(ballX, barY)
+                                )
+                            }
+                        }
+
                         // Current Segment Text
                         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Text(
                                 text = currentSegmentText,
-                                style = MaterialTheme.typography.titleLarge, // Smaller font for fitting
+                                style = MaterialTheme.typography.titleMedium, // Smaller font for fitting
                                 color = Color(0xFFFFD700), // Gold/yellowish for noir contrast
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.verticalScroll(rememberScrollState())
                             )
                         }
-                        
-                        // Segment progress and remaining time
-                        Text(
-                            text = "Segment Time: ${segmentTimeRemainingSec}s",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = Color.LightGray,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(4.dp))
-                        
-                        // Custom visual for |----*--| based on progress
-                        val barLength = 20
-                        val starPos = (segmentProgress * barLength).toInt().coerceIn(0, barLength - 1)
-                        val progressString = buildString {
-                            append("|")
-                            for (i in 0 until barLength) {
-                                if (i == starPos) append("*") else append("-")
-                            }
-                            append("|")
-                        }
-                        
-                        Text(
-                            text = progressString,
-                            style = MaterialTheme.typography.titleMedium.copy(letterSpacing = 2.sp),
-                            color = Color.White
-                        )
                     }
                 } else {
                     // Ready to record state
                     Text(
-                        text = "Ready to Record",
+                        text = "Recording Studio",
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
                         modifier = Modifier
@@ -208,7 +231,7 @@ fun RecordingStudioScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (isFinished) {
+                    if (isFinished || (activeScript?.videoPath != null && !isRecording && !isCountingDown)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             // Re-Record button
                             OutlinedButton(
@@ -262,18 +285,20 @@ fun RecordingStudioScreen(
                             ),
                             border = BorderStroke(1.dp, Color.Red)
                         ) {
-                            Text("Stop Early")
+                            Text("Stop Early", color = Color.White)
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    OutlinedButton(
-                        onClick = onNavigateBack,
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
-                    ) {
-                        Text("←")
+                    if (!isRecording && !isCountingDown) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        OutlinedButton(
+                            onClick = onNavigateBack,
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
+                            border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        ) {
+                            Text("←")
+                        }
                     }
                 }
             }

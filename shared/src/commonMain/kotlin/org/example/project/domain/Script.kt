@@ -8,9 +8,11 @@ data class Script(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val title: String,
+    val prompt: String = "",
     val content: String,
     val targetDuration: Int? = null,
     val isActive: Boolean = false,
     val scriptState: String = "WRITERS_ROOM",
-    val videoPath: String? = null
+    val videoPath: String? = null,
+    val skippedSegmentsJson: String = "" // New field
 )

@@ -116,7 +116,7 @@ fun App() {
                                 }
                                 RecordingStudioScreen(
                                     viewModel = recordingViewModel,
-                                    onNavigateBack = onBack,
+                                    onNavigateBack = { backStack.add(Screen.WritersRoom) }, // Go back to Writer's Room
                                     onNavigateForward = { backStack.add(Screen.EditingStudio) }
                                 )
                             }
@@ -126,7 +126,7 @@ fun App() {
                                 }
                                 EditingStudioScreen(
                                     viewModel = editingViewModel,
-                                    onNavigateBack = onBack,
+                                    onNavigateBack = { backStack.add(Screen.RecordingStudio) }, // Go back to Recording Studio
                                     onNavigateForward = { backStack.add(Screen.PublishingStudio) }
                                 )
                             }
