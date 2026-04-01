@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,9 +33,9 @@ fun HomeScreen(
         Text(
             text = "The Factory",
             style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFFFFD700), // Gold for Noir theme
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
                 .padding(horizontal = 24.dp, vertical = 12.dp)
         )
 
@@ -47,10 +46,10 @@ fun HomeScreen(
                 onClick = onNavigateToWritersRoom,
                 modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                    contentColor = Color(0xFFFFD700)
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    contentColor = MaterialTheme.colorScheme.primary
                 ),
-                border = BorderStroke(1.dp, Color(0xFFFFD700))
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {
                 Text("Writer's Room", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -58,31 +57,31 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(24.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Active Project", style = MaterialTheme.typography.titleMedium, color = Color.LightGray)
+                    Text("Active Project", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "\"${activeScript?.title}\"", 
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), 
-                        color = Color(0xFFFFD700)
+                        text = activeScript?.title ?: "", // Corrected string interpolation
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
                     val state = activeScript?.scriptState ?: "WRITERS_ROOM"
                     
                     val primaryButtonColors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                        contentColor = Color(0xFFFFD700)
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                        contentColor = MaterialTheme.colorScheme.primary
                     )
                     val secondaryButtonColors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFFFD700)
+                        contentColor = MaterialTheme.colorScheme.primary
                     )
-                    val buttonBorder = BorderStroke(1.dp, Color(0xFFFFD700))
+                    val buttonBorder = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
 
                     when (state) {
                         "WRITERS_ROOM" -> {
@@ -157,7 +156,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     TextButton(
                         onClick = { viewModel.archiveActiveScript() },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFF5252)) // Red color for archive
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("↓ Archive Project")
                     }
@@ -170,8 +169,8 @@ fun HomeScreen(
         OutlinedButton(
             onClick = onNavigateToArchives,
             modifier = Modifier.fillMaxWidth(0.8f).height(56.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-            border = BorderStroke(1.dp, Color(0xFFFFD700))
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         ) {
             Text("Archives", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }

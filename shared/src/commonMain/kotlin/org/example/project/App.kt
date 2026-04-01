@@ -55,10 +55,12 @@ import org.example.project.ui.publishingstudio.PublishingStudioViewModel
 import org.example.project.ui.archives.ArchivesScreen
 import org.example.project.ui.archives.ArchivesViewModel
 
+import org.example.project.ui.theme.MovieTheme
+
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    MovieTheme {
         AppPermissionsHandler {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Image(

@@ -13,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -41,9 +40,9 @@ fun ArchivesScreen(
         Text(
             text = "Archives",
             style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFFFFD700), // Gold for Noir theme
+            color = MaterialTheme.colorScheme.primary, // Gold for Noir theme
             modifier = Modifier
-                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
                 .padding(horizontal = 24.dp, vertical = 12.dp)
         )
 
@@ -54,10 +53,10 @@ fun ArchivesScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(16.dp)),
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No archived projects found.", color = Color.Gray, fontSize = 18.sp)
+                Text("No archived projects found.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 18.sp)
             }
         } else {
             LazyColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -75,8 +74,8 @@ fun ArchivesScreen(
         OutlinedButton(
             onClick = onNavigateBack, 
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-            border = BorderStroke(1.dp, Color(0xFFFFD700))
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
         ) {
             Text("← Home", fontSize = 16.sp)
         }
@@ -86,7 +85,7 @@ fun ArchivesScreen(
         AlertDialog(
             onDismissRequest = { selectedScript = null },
             title = { Text("Restore Project") },
-            text = { Text("Where would you like to resume this project? \n\nRestoring to the Writer's Room will keep your recorded video unless you generate a new script.", color = Color.LightGray) },
+            text = { Text("Where would you like to resume this project? \n\nRestoring to the Writer's Room will keep your recorded video unless you generate a new script.", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
@@ -97,8 +96,8 @@ fun ArchivesScreen(
                             selectedScript = null
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Restore to Writer's Room")
                     }
@@ -111,18 +110,18 @@ fun ArchivesScreen(
                             selectedScript = null
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        border = BorderStroke(1.dp, Color.White)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface)
                     ) {
                         Text("Restore to Last Stage")
                     }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { selectedScript = null }) { Text("Cancel", color = Color.Gray) }
+                TextButton(onClick = { selectedScript = null }) { Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant) }
             },
-            containerColor = Color(0xFF222222),
-            titleContentColor = Color(0xFFFFD700)
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -133,7 +132,7 @@ fun ArchiveItemCard(script: Script, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp)
     ) {
@@ -141,7 +140,7 @@ fun ArchiveItemCard(script: Script, onClick: () -> Unit) {
             Text(
                 text = script.title,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFFFFD700),
+                color = MaterialTheme.colorScheme.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -149,7 +148,7 @@ fun ArchiveItemCard(script: Script, onClick: () -> Unit) {
             Text(
                 text = "Last Stage: ${script.scriptState.replace("_", " ")}",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

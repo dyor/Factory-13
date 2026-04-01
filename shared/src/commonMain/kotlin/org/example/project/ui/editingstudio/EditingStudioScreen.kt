@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,9 +66,9 @@ fun EditingStudioScreen(
         Text(
             text = "Editing Studio",
             style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFFFFD700), // Gold for Noir theme
+            color = MaterialTheme.colorScheme.primary, // Gold for Noir theme
             modifier = Modifier
-                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
                 .padding(horizontal = 24.dp, vertical = 12.dp)
         )
 
@@ -78,12 +79,12 @@ fun EditingStudioScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(16.dp)),
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "No video found. Please go back to Recording Studio.",
-                    color = Color.Red
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         } else {
@@ -116,7 +117,7 @@ fun EditingStudioScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Red.copy(alpha = 0.4f))
+                            .background(MaterialTheme.colorScheme.error.copy(alpha = 0.4f))
                     )
                 }
             }
@@ -128,18 +129,32 @@ fun EditingStudioScreen(
                 modifier = Modifier
                     .weight(0.5f)
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Current Time: ${currentTime / 1000}s / ${videoDuration / 1000}s",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 // Timeline Visualization
+                val listState = rememberLazyListState()
+                
+                // Calculate the target block index that should be visible/centered
+                val activeBlockIndex = selectedBlockIndex ?: (currentTime / 1000).toInt()
+                
+                LaunchedEffect(activeBlockIndex) {
+                    if (activeBlockIndex >= 0 && activeBlockIndex < timelineBlocks.size) {
+                        // Animate scroll to the target item.
+                        // We use a small negative scroll offset to roughly center it in the view
+                        listState.animateScrollToItem(activeBlockIndex, scrollOffset = -150)
+                    }
+                }
+
                 LazyRow(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp)
@@ -165,15 +180,15 @@ fun EditingStudioScreen(
                                 .fillMaxHeight()
                                 .background(
                                     color = when {
-                                        block.isFullySkipped -> Color.Red.copy(alpha = 0.6f)
-                                        block.isPartiallySkipped -> Color(0xFFFFA500).copy(alpha = 0.6f) // Orange for partial
-                                        else -> Color.Gray.copy(alpha = 0.6f)
+                                        block.isFullySkipped -> MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+                                        block.isPartiallySkipped -> Color(0xFFFFA500).copy(alpha = 0.6f) // Orange for partial, keeping hardcoded for specific visual
+                                        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     },
                                     shape = RoundedCornerShape(4.dp)
                                 )
                                 .border(
                                     width = if (isActiveOrSelected) 2.dp else 0.dp,
-                                    color = if (isActiveOrSelected) Color(0xFFFFD700) else Color.Transparent,
+                                    color = if (isActiveOrSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                                     shape = RoundedCornerShape(4.dp)
                                 )
                                 .clickable {
@@ -185,7 +200,7 @@ fun EditingStudioScreen(
                         ) {
                             Text(
                                 text = "${block.secondIndex}s",
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -207,8 +222,8 @@ fun EditingStudioScreen(
                             if (isPlaybackCompleted) viewModel.replay() else viewModel.togglePlayPause() 
                         }, 
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Text(playButtonText, maxLines = 1)
                     }
@@ -216,10 +231,10 @@ fun EditingStudioScreen(
                     OutlinedButton(
                         onClick = { viewModel.restoreOriginalVideo() }, 
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFF5252)), // Red
-                        border = BorderStroke(1.dp, Color(0xFFFF5252))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error), // Red
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
                     ) {
-                        Text("Restore Original", maxLines = 1)
+                        Text("Restore", maxLines = 1)
                     }
                 }
 
@@ -229,8 +244,8 @@ fun EditingStudioScreen(
                     OutlinedButton(
                         onClick = onNavigateBack,
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Text("←", fontSize = 20.sp)
                     }
@@ -243,10 +258,10 @@ fun EditingStudioScreen(
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                            contentColor = Color(0xFFFFD700)
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Publish →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
@@ -263,7 +278,7 @@ fun EditingStudioScreen(
                     selectedBlockIndex = null // Clear selection when modal closes
                 },
                 sheetState = sheetState,
-                containerColor = Color(0xFF222222)
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 Column(
                     modifier = Modifier
@@ -274,12 +289,12 @@ fun EditingStudioScreen(
                     Text(
                         text = "Fine-Tune Second ${block.secondIndex}", 
                         style = MaterialTheme.typography.titleLarge,
-                        color = Color(0xFFFFD700)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Tap a 0.1s block to toggle removal (red = skipped).", 
-                        color = Color.LightGray, 
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, 
                         style = MaterialTheme.typography.bodySmall
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -293,8 +308,8 @@ fun EditingStudioScreen(
                                 viewModel.skipAllSubBlocks(block.secondIndex)
                                 showFineTuneModal = viewModel.timelineBlocks.value.getOrNull(block.secondIndex)
                             },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                            border = BorderStroke(1.dp, Color.Red)
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
                         ) {
                             Text("Skip All")
                         }
@@ -323,7 +338,7 @@ fun EditingStudioScreen(
                                     .height(40.dp)
                                     .padding(1.dp)
                                     .background(
-                                        if (subBlock.isSkipped) Color.Red else Color.Green,
+                                        if (subBlock.isSkipped) MaterialTheme.colorScheme.error else Color.Green,
                                         RoundedCornerShape(2.dp)
                                     )
                                     .clickable {
@@ -343,8 +358,8 @@ fun EditingStudioScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFD700),
-                            contentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text("Done", fontWeight = FontWeight.Bold)

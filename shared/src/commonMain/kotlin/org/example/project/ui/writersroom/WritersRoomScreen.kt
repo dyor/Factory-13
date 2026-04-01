@@ -53,9 +53,9 @@ fun WritersRoomScreen(
             Text(
                 text = "Writer's Room",
                 style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFFFFD700), // Gold for Noir theme
+                color = MaterialTheme.colorScheme.primary, // Themed Gold
                 modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp)) // Themed background
                     .padding(horizontal = 24.dp, vertical = 12.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -65,7 +65,7 @@ fun WritersRoomScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(16.dp)) // Themed background
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -75,14 +75,14 @@ fun WritersRoomScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 100.dp, max = 200.dp)
-                            .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(8.dp)) // Themed background
                             .onFocusChanged { promptHasFocus = it.isFocused },
-                        label = { Text("Prompt Idea", color = Color.LightGray) },
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                        label = { Text("Prompt Idea", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Themed Light Gray
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface), // Themed White
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFFFFD700),
-                            unfocusedBorderColor = Color.DarkGray,
-                            cursorColor = Color(0xFFFFD700),
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Dark Gray
+                            cursorColor = MaterialTheme.colorScheme.primary, // Themed Gold
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent,
@@ -94,7 +94,7 @@ fun WritersRoomScreen(
                     Text(
                         text = "Target Duration: ${targetDuration}s",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onSurface // Themed White
                     )
                     Slider(
                         value = targetDuration.toFloat(),
@@ -102,9 +102,9 @@ fun WritersRoomScreen(
                         valueRange = 5f..60f,
                         steps = 54,
                         colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFFFFD700),
-                            activeTrackColor = Color(0xFFFFD700).copy(alpha = 0.7f),
-                            inactiveTrackColor = Color.DarkGray
+                            thumbColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                            activeTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), // Themed Gold
+                            inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant // Themed Dark Gray
                         )
                     )
                     
@@ -118,17 +118,17 @@ fun WritersRoomScreen(
                         enabled = !isGenerating && promptContent.isNotBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                            contentColor = Color(0xFFFFD700),
-                            disabledContentColor = Color.Gray,
-                            disabledContainerColor = Color.DarkGray.copy(alpha = 0.3f)
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), // Themed Gold
+                            contentColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Gray
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) // Themed Dark Gray
                         ),
-                        border = BorderStroke(1.dp, if (!isGenerating && promptContent.isNotBlank()) Color(0xFFFFD700) else Color.Gray)
+                        border = BorderStroke(1.dp, if (!isGenerating && promptContent.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) // Themed border
                     ) {
                         if (isGenerating) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = Color(0xFFFFD700)
+                                color = MaterialTheme.colorScheme.primary // Themed Gold
                             )
                         } else {
                             Text("Generate Script", fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -146,18 +146,18 @@ fun WritersRoomScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 250.dp)
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(8.dp)) // Themed background
                     .onFocusChanged { scriptHasFocus = it.isFocused },
-                label = { Text("Generated Script Content", color = Color.LightGray) },
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                label = { Text("Generated Script Content", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Themed Light Gray
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface), // Themed White
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFFFD700),
-                    unfocusedBorderColor = Color.DarkGray,
-                    cursorColor = Color(0xFFFFD700),
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                )
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Dark Gray
+                            cursorColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                        )
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -166,14 +166,14 @@ fun WritersRoomScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp)) // Themed background
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 OutlinedButton(
                     onClick = onNavigateBack,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                    border = BorderStroke(1.dp, Color(0xFFFFD700))
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
                 ) {
                     Text("←", fontSize = 20.sp)
                 }
@@ -181,8 +181,8 @@ fun WritersRoomScreen(
                 if (activeScript != null) {
                     OutlinedButton(
                         onClick = { showArchiveDialog = true },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
                     ) {
                         Text("↓", fontSize = 20.sp)
                     }
@@ -196,11 +196,12 @@ fun WritersRoomScreen(
                     },
                     enabled = generatedScript.isNotBlank() && !isGenerating,
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                        contentColor = Color(0xFFFFD700),
-                        disabledContentColor = Color.Gray
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), // Themed Gold
+                        contentColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Gray
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) // Themed Dark Gray
                     ),
-                    border = BorderStroke(1.dp, if(generatedScript.isNotBlank() && !isGenerating) Color(0xFFFFD700) else Color.Gray)
+                    border = BorderStroke(1.dp, if(generatedScript.isNotBlank() && !isGenerating) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) // Themed border
                 ) {
                     Text("Record →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
@@ -211,20 +212,20 @@ fun WritersRoomScreen(
             AlertDialog(
                 onDismissRequest = { showArchiveDialog = false },
                 title = { Text("Archive Script?") },
-                text = { Text("Are you sure you want to archive this script?") },
+                text = { Text("Are you sure you want to archive this script?", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Themed Light Gray
                 confirmButton = {
                     TextButton(onClick = {
                         showArchiveDialog = false
                         viewModel.archiveScript()
                         onNavigateBack()
-                    }) { Text("Yes") }
+                    }) { Text("Yes", color = MaterialTheme.colorScheme.primary) } // Themed Gold
                 },
                 dismissButton = {
-                    TextButton(onClick = { showArchiveDialog = false }) { Text("Cancel") }
+                    TextButton(onClick = { showArchiveDialog = false }) { Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant) } // Themed Gray
                 },
-                containerColor = Color(0xFF222222),
-                titleContentColor = Color(0xFFFFD700),
-                textContentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface, // Themed background
+                titleContentColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                textContentColor = MaterialTheme.colorScheme.onSurface // Themed White
             )
         }
     }

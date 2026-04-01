@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,9 +40,9 @@ fun PublishingStudioScreen(
         Text(
             text = "Publishing Studio",
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFFFFD700), // Gold for Noir theme
+            color = MaterialTheme.colorScheme.primary, // Gold for Noir theme
             modifier = Modifier
-                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(12.dp))
                 .padding(horizontal = 24.dp, vertical = 12.dp)
         )
 
@@ -53,11 +52,11 @@ fun PublishingStudioScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
-                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), RoundedCornerShape(16.dp))
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No video to publish.", color = Color.Red, fontSize = 18.sp)
+                Text("No video to publish.", color = MaterialTheme.colorScheme.error, fontSize = 18.sp)
             }
         } else {
             // Video Player
@@ -65,7 +64,7 @@ fun PublishingStudioScreen(
                 modifier = Modifier
                     .weight(0.6f) // Take more space for video
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(8.dp)
             ) {
                 val videoPath = activeScript!!.videoPath!!
@@ -89,14 +88,14 @@ fun PublishingStudioScreen(
                 modifier = Modifier
                     .weight(0.4f) // Remaining space
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Current Time: ${currentTime / 1000}s / ${videoDuration / 1000}s",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -109,8 +108,8 @@ fun PublishingStudioScreen(
                 OutlinedButton(
                     onClick = { viewModel.togglePlayPause() }, 
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                    border = BorderStroke(1.dp, Color(0xFFFFD700))
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
                     Text(playButtonText, maxLines = 1)
                 }
@@ -121,10 +120,10 @@ fun PublishingStudioScreen(
                         onClick = { viewModel.shareCurrentVideo() },
                         modifier = Modifier.fillMaxWidth().height(48.dp), // Smaller height
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(0xFFFFD700).copy(alpha = 0.2f),
-                            contentColor = Color(0xFFFFD700)
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            contentColor = MaterialTheme.colorScheme.primary
                         ),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Export / Share ↑", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
@@ -139,8 +138,8 @@ fun PublishingStudioScreen(
                         OutlinedButton(
                             onClick = onNavigateBack, 
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                            border = BorderStroke(1.dp, Color(0xFFFFD700))
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                         ) {
                             Text("←", maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
@@ -150,8 +149,8 @@ fun PublishingStudioScreen(
                         OutlinedButton(
                             onClick = { viewModel.markAsPublished { onNavigateHome() } },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                            border = BorderStroke(1.dp, Color(0xFFFFD700))
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                         ) {
                             Text("↓ Archive", maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }

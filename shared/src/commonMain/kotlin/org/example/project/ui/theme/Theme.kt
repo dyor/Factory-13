@@ -55,10 +55,9 @@ fun MovieTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography, // We will define this later or use default Material 3
         content = content
     )
 }
 
 // TODO: Define custom Typography if needed, otherwise use MaterialTheme.typography defaults.
-val Typography = MaterialTheme.typography
+// We cannot eagerly access MaterialTheme.typography outside of a @Composable function.
