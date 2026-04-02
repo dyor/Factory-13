@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<journey name="Home Screen Routing">
-    <description>Verify that the home screen correctly routes the user based on active project state.</description>
-    <actions xml:space="preserve">
-        <action>Verify that there is an option to Start New Video or to continue an active script.</action>
-        <action>Tap 'Archives' to navigate to the Archives screen.</action>
-        <action>Tap 'Back to Home' to return to the home screen.</action>
-    </actions>
-</journey>
