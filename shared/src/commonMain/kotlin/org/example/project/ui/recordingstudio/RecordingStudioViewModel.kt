@@ -95,6 +95,13 @@ class RecordingStudioViewModel(
                 fallbackTime += 5
             }
         }
+        
+        // Add a 5-second buffer segment at the end so the speaker doesn't get cut off
+        if (parsedSegments.isNotEmpty()) {
+            val lastTime = parsedSegments.last().endTimeSec
+            parsedSegments.add(ScriptSegment(lastTime, lastTime + 5, "...and cut!"))
+        }
+        
         return parsedSegments
     }
 
@@ -145,7 +152,7 @@ class RecordingStudioViewModel(
             return
         }
 
-        val totalDurationMs = (currentSegments.last().endTimeSec + 2) * 1000L // Add 2 seconds buffer
+        val totalDurationMs = currentSegments.last().endTimeSec * 1000L // Buffer is already included in parsed segments
 
         teleprompterJob = viewModelScope.launch {
             actualElapsedMs = 0L

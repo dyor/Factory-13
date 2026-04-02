@@ -3,6 +3,7 @@ package org.example.project.ui.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import kotlinx.cinterop.useContents
@@ -27,6 +28,7 @@ actual fun VideoPlayer(
 ) {
     val player = remember { AVPlayer() }
     val playerViewController = remember { AVPlayerViewController() }
+    val currentOnCompletion by androidx.compose.runtime.rememberUpdatedState(onCompletion)
 
     LaunchedEffect(videoPath) {
         if (videoPath.isNotBlank()) {
@@ -62,13 +64,23 @@ actual fun VideoPlayer(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isPlaying) {
         while (true) {
             delay(100)
             if (player.rate > 0.0) {
                 val time = player.currentTime()
                 val seconds = time.useContents { value.toDouble() / timescale.toDouble() }
                 onTimeUpdate((seconds * 1000).toLong())
+            } else if (isPlaying) {
+                val currentItem = player.currentItem
+                if (currentItem != null) {
+                    val duration = currentItem.duration.useContents { value.toDouble() / timescale.toDouble() }
+                    val time = player.currentTime()
+                    val seconds = time.useContents { value.toDouble() / timescale.toDouble() }
+                    if (duration > 0.0 && seconds >= duration - 0.5) {
+                        currentOnCompletion()
+                    }
+                }
             }
         }
     }

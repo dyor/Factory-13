@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.example.project.domain.Script
 import org.example.project.domain.ScriptDao
 import org.example.project.domain.getVideoDuration
+import org.example.project.domain.resolveVideoPath
 import org.example.project.domain.trimVideo
 
 import kotlinx.serialization.Serializable
@@ -102,7 +103,8 @@ class EditingStudioViewModel(
                 _videoPath.value = script?.videoPath
                 script?.videoPath?.let { path ->
                     try {
-                        val duration = getVideoDuration(path)
+                        val resolvedPath = resolveVideoPath(path)
+                        val duration = getVideoDuration(resolvedPath)
                         _videoDuration.value = duration
                         
                         if (!script.skippedSegmentsJson.isNullOrBlank()) {
@@ -179,6 +181,7 @@ class EditingStudioViewModel(
 
     fun seekTo(positionMs: Long) {
         _seekRequest.value = positionMs
+        _currentTimeMs.value = positionMs // Optimistically update time to force UI refresh immediately
         _isPlaybackCompleted.value = false
     }
     

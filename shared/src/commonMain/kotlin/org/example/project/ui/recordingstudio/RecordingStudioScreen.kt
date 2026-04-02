@@ -187,10 +187,9 @@ fun RecordingStudioScreen(
                         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Text(
                                 text = currentSegmentText,
-                                style = MaterialTheme.typography.titleMedium, // Smaller font for fitting
-                                color = MaterialTheme.colorScheme.primary, // Themed Gold
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onSurface, // Themed White
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.verticalScroll(rememberScrollState())
                             )
                         }
                     }

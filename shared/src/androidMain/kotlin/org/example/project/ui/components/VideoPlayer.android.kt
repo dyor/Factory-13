@@ -19,6 +19,7 @@ actual fun VideoPlayer(
 ) {
     val context = LocalContext.current
     val videoView = remember { VideoView(context) }
+    val currentOnCompletion by rememberUpdatedState(onCompletion)
 
     LaunchedEffect(videoPath) {
         if (videoPath.isNotBlank()) {
@@ -45,11 +46,14 @@ actual fun VideoPlayer(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isPlaying) {
         while (true) {
             delay(100)
             if (videoView.isPlaying) {
                 onTimeUpdate(videoView.currentPosition.toLong())
+            } else if (isPlaying && videoView.duration > 0 && videoView.currentPosition >= videoView.duration - 500) {
+                // Failsafe: If the state expects it to be playing, but it's stopped near the end, trigger completion
+                currentOnCompletion()
             }
         }
     }
@@ -64,7 +68,7 @@ actual fun VideoPlayer(
         modifier = modifier,
         factory = { 
             videoView.apply {
-                setOnCompletionListener { onCompletion() }
+                setOnCompletionListener { currentOnCompletion() }
             }
         },
         update = { 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.example.project.domain.Script
 import org.example.project.domain.ScriptDao
 import org.example.project.domain.getVideoDuration
+import org.example.project.domain.resolveVideoPath
 import org.example.project.domain.shareVideo
 
 class PublishingStudioViewModel(
@@ -64,7 +65,8 @@ class PublishingStudioViewModel(
                 _activeScript.value = script
                 script?.videoPath?.let { path ->
                     try {
-                        _videoDuration.value = getVideoDuration(path)
+                        val resolvedPath = resolveVideoPath(path)
+                        _videoDuration.value = getVideoDuration(resolvedPath)
                     } catch (e: Exception) {}
                 }
             }
