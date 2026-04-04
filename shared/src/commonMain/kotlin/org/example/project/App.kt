@@ -75,6 +75,11 @@ fun App() {
                 }
                 val onBack = { if (backStack.size > 1) backStack.removeLast() }
     
+                val onNavigateHome = { 
+                    backStack.clear()
+                    backStack.add(Screen.Home)
+                }
+    
                 Column(
                     modifier = Modifier
                         .widthIn(max = 600.dp)
@@ -108,7 +113,7 @@ fun App() {
                                 }
                                 WritersRoomScreen(
                                     viewModel = viewModel,
-                                    onNavigateBack = onBack,
+                                    onNavigateBack = { onNavigateHome() },
                                     onNavigateToRecording = { backStack.add(Screen.RecordingStudio) }
                                 )
                             }
@@ -118,7 +123,7 @@ fun App() {
                                 }
                                 RecordingStudioScreen(
                                     viewModel = recordingViewModel,
-                                    onNavigateBack = { backStack.add(Screen.WritersRoom) }, // Go back to Writer's Room
+                                    onNavigateBack = { onNavigateHome() },
                                     onNavigateForward = { backStack.add(Screen.EditingStudio) }
                                 )
                             }
@@ -128,7 +133,7 @@ fun App() {
                                 }
                                 EditingStudioScreen(
                                     viewModel = editingViewModel,
-                                    onNavigateBack = { backStack.add(Screen.RecordingStudio) }, // Go back to Recording Studio
+                                    onNavigateBack = { onNavigateHome() },
                                     onNavigateForward = { backStack.add(Screen.PublishingStudio) }
                                 )
                             }
@@ -138,11 +143,8 @@ fun App() {
                                 }
                                 PublishingStudioScreen(
                                     viewModel = publishingViewModel,
-                                    onNavigateBack = onBack,
-                                    onNavigateHome = { 
-                                        backStack.clear()
-                                        backStack.add(Screen.Home)
-                                    }
+                                    onNavigateBack = { onNavigateHome() },
+                                    onNavigateHome = { onNavigateHome() }
                                 )
                             }
                             entry<Screen.Archives> {
@@ -151,7 +153,7 @@ fun App() {
                                 }
                                 ArchivesScreen(
                                     viewModel = archivesViewModel,
-                                    onNavigateBack = onBack,
+                                    onNavigateBack = { onNavigateHome() },
                                     onNavigateToStudio = { state ->
                                         backStack.clear()
                                         backStack.add(Screen.Home)

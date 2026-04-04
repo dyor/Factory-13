@@ -63,7 +63,8 @@ class PublishingStudioViewModel(
         viewModelScope.launch {
             scriptDao.getActiveScript().collect { script ->
                 _activeScript.value = script
-                script?.videoPath?.let { path ->
+                val pathToPlay = script?.publishedVideoPath ?: script?.videoPath
+                pathToPlay?.let { path ->
                     try {
                         val resolvedPath = resolveVideoPath(path)
                         _videoDuration.value = getVideoDuration(resolvedPath)
@@ -74,7 +75,7 @@ class PublishingStudioViewModel(
     }
 
     fun shareCurrentVideo() {
-        val path = _activeScript.value?.videoPath
+        val path = _activeScript.value?.publishedVideoPath ?: _activeScript.value?.videoPath
         if (path != null) {
             shareVideo(path)
         }

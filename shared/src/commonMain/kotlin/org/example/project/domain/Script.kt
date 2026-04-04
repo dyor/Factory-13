@@ -13,6 +13,7 @@ data class Script(
     val targetDuration: Int? = null,
     val isActive: Boolean = false,
     val scriptState: String = "WRITERS_ROOM",
-    val videoPath: String? = null,
-    val skippedSegmentsJson: String = "" // New field
+    val videoPath: String? = null, // The raw/original video
+    val publishedVideoPath: String? = null, // The final output of the Editing Studio
+    val skippedSegmentsJson: String = ""
 )

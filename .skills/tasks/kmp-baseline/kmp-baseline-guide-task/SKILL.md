@@ -121,3 +121,11 @@ Goal: Refine the user experience with precise video editing, dynamic durations, 
 - [x] **Agent Action**: Update the iOS and Android app icons using the `film_noir.png` asset (e.g., using `sips` for macOS to generate `app-icon-1024.png`).
 - [x] **Agent Action**: Run `git add . && git commit -m "Phase 5: Polish complete"`.
 - [x] **Agent Action**: Update progress tracking by executing `.skills/tasks/kmp-baseline/kmp-baseline-calculator-task/SKILL.md` to reflect Phase 5 completion.
+
+## Native iOS Video Recording Fixes (AVCaptureSession & Audio Drops)
+Goal: Document the critical workarounds implemented to fix black screens and 10-second audio drops on iOS.
+
+- **Black Screen on iOS UI**: When mapping an `AVCaptureVideoPreviewLayer` to Compose Multiplatform's `UIKitView`, the view bounds are initially `0x0` and Compose does not automatically resize `CALayer` objects when bounds update. 
+  - *Fix*: Created a custom `UIView` subclass (`CameraPreviewView`) that overrides `layoutSubviews()` and uses `CATransaction` to forcibly snap the `previewLayer.frame` to the new bounds natively. Additionally, moved `captureSession.startRunning()` to a background `dispatch_async` queue, as calling it on the main thread (default Compose behavior) locks the UI and causes a permanent black screen on modern iOS devices.
+- **10-Second Audio Drop Bug**: By default, iOS `AVCaptureMovieFileOutput` forces a 10-second `movieFragmentInterval` to prevent data loss on crashes. However, when recording to an `.mp4` container (as hardcoded by libraries like CameraK), AVFoundation's strictly compliant MP4 parser chokes on the fragmented sample tables and permanently drops the audio track on any video longer than 10 seconds.
+  - *Fix*: Completely bypassed the KMP `CameraK` video recording plugin on iOS. Implemented a 100% native `IOSCameraManager` that manually constructs the `AVCaptureSession`, binds the microphone/camera, and explicitly sets `movieOutput.movieFragmentInterval = kCMTimeInvalid` *before* recording starts. This forces AVFoundation to write a single, clean, unfragmented MP4 sample table at the end of the recording, perfectly preserving audio sync for clips of any length.

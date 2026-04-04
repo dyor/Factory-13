@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import org.example.project.domain.Script
+import org.example.project.domain.CaptionInfo
 import org.example.project.domain.ScriptDao
 import org.example.project.domain.getVideoDuration
 import org.example.project.domain.resolveVideoPath
@@ -30,7 +34,8 @@ data class TimelineBlock(
     val secondIndex: Int,
     val startTimeMs: Long,
     val endTimeMs: Long,
-    val subBlocks: List<TimelineSubBlock>
+    val subBlocks: List<TimelineSubBlock>,
+    val isBuffer: Boolean = false
 ) {
     val isFullySkipped: Boolean
         get() = subBlocks.all { it.isSkipped }
@@ -99,6 +104,14 @@ class EditingStudioViewModel(
     init {
         viewModelScope.launch {
             scriptDao.getActiveScript().collect { script ->
+                // Update script state if it isn't already EDITING_STUDIO or further along
+                if (script != null && script.scriptState != "EDITING_STUDIO" && script.scriptState != "PUBLISHING_STUDIO") {
+                    val updatedScript = script.copy(scriptState = "EDITING_STUDIO")
+                    scriptDao.update(updatedScript)
+                    // The flow will emit again with the updated script
+                    return@collect
+                }
+
                 _activeScript.value = script
                 _videoPath.value = script?.videoPath
                 script?.videoPath?.let { path ->
@@ -112,10 +125,10 @@ class EditingStudioViewModel(
                                 _timelineBlocks.value = Json.decodeFromString(script.skippedSegmentsJson)
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                                generateTimeline(duration)
+                                generateTimeline(duration, script.content)
                             }
                         } else {
-                            generateTimeline(duration)
+                            generateTimeline(duration, script.content)
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -125,9 +138,22 @@ class EditingStudioViewModel(
         }
     }
     
-    private fun generateTimeline(durationMs: Long) {
+    private fun generateTimeline(durationMs: Long, scriptContent: String? = null) {
         val blocks = mutableListOf<TimelineBlock>()
         val totalSeconds = kotlin.math.ceil(durationMs / 1000.0).toInt()
+        
+        // Parse the script to identify buffer seconds
+        val bufferSeconds = mutableSetOf<Int>()
+        if (scriptContent != null) {
+            val segments = parseScriptForBuffers(scriptContent)
+            for (seg in segments) {
+                if (seg.isBuffer) {
+                    for (s in seg.startTimeSec until seg.endTimeSec) {
+                        bufferSeconds.add(s)
+                    }
+                }
+            }
+        }
         
         for (sec in 0 until totalSeconds) {
             val secStart = sec * 1000L
@@ -141,9 +167,54 @@ class EditingStudioViewModel(
                     subBlocks.add(TimelineSubBlock(subStart, subEnd))
                 }
             }
-            blocks.add(TimelineBlock(sec, secStart, secEnd, subBlocks))
+            blocks.add(TimelineBlock(sec, secStart, secEnd, subBlocks, isBuffer = bufferSeconds.contains(sec)))
         }
         _timelineBlocks.value = blocks
+    }
+
+    // Helper to parse script structure exactly as RecordingStudioViewModel does to find buffer blocks
+    private data class ParsedSegment(val startTimeSec: Int, val endTimeSec: Int, val text: String, val isBuffer: Boolean)
+    
+    private fun parseScriptForBuffers(content: String): List<ParsedSegment> {
+        val regex = Regex("""^(\d+)s-(\d+)s:?\s*(.*)$""")
+        val lines = content.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+        val parsedSegments = mutableListOf<ParsedSegment>()
+        
+        var runningTime = 0
+        
+        for ((index, line) in lines.withIndex()) {
+            val match = regex.find(line)
+            val text: String
+            val duration: Int
+            
+            if (match != null) {
+                val parsedStart = match.groupValues[1].toInt()
+                val parsedEnd = match.groupValues[2].toInt()
+                duration = maxOf(1, parsedEnd - parsedStart)
+                text = match.groupValues[3]
+            } else {
+                duration = 5
+                text = line
+            }
+            
+            val segStart = runningTime
+            val segEnd = runningTime + duration
+            parsedSegments.add(ParsedSegment(segStart, segEnd, text, isBuffer = false))
+            runningTime = segEnd
+            
+            // Add a 2-second buffer between segments
+            if (index < lines.lastIndex) {
+                parsedSegments.add(ParsedSegment(runningTime, runningTime + 2, text, isBuffer = true))
+                runningTime += 2
+            }
+        }
+        
+        if (parsedSegments.isNotEmpty()) {
+            val lastTime = parsedSegments.last().endTimeSec
+            parsedSegments.add(ParsedSegment(lastTime, lastTime + 5, "...and cut!", isBuffer = true))
+        }
+        
+        return parsedSegments
     }
 
     fun togglePlayPause() {
@@ -229,11 +300,53 @@ class EditingStudioViewModel(
         _isPreviewingWithoutSkipped.value = false
     }
 
+    private val _captionPosition = MutableStateFlow(org.example.project.domain.CaptionPosition.BOTTOM)
+    val captionPosition: StateFlow<org.example.project.domain.CaptionPosition> = _captionPosition.asStateFlow()
+
+    fun updateCaptionPosition(position: org.example.project.domain.CaptionPosition) {
+        _captionPosition.value = position
+    }
+
+    fun archiveScript() {
+        val currentScript = _activeScript.value
+        if (currentScript != null) {
+            viewModelScope.launch {
+                val updatedScript = currentScript.copy(scriptState = "ARCHIVED")
+                scriptDao.update(updatedScript)
+                _activeScript.value = null
+            }
+        }
+    }
+
+    private val _isProcessing = MutableStateFlow(false)
+    val isProcessing: StateFlow<Boolean> = _isProcessing.asStateFlow()
+
+    fun onVideoImported(filePath: String) {
+        val currentScript = _activeScript.value
+        if (currentScript != null) {
+            viewModelScope.launch {
+                _isProcessing.value = true
+                val duration = getVideoDuration(resolveVideoPath(filePath))
+                val updatedScript = currentScript.copy(
+                    videoPath = filePath,
+                    skippedSegmentsJson = ""
+                )
+                scriptDao.update(updatedScript)
+                _activeScript.value = updatedScript
+                _videoPath.value = filePath
+                _videoDuration.value = duration
+                generateTimeline(duration, updatedScript.content)
+                _isProcessing.value = false
+            }
+        }
+    }
+
     fun saveModifiedVideo(onSaved: () -> Unit) {
         val currentScript = _activeScript.value
         val path = _videoPath.value
         if (currentScript != null && path != null) {
             viewModelScope.launch {
+                _isProcessing.value = true
                 try {
                     val unskippedSegments = getUnskippedSegments(_timelineBlocks.value)
                     
@@ -241,18 +354,35 @@ class EditingStudioViewModel(
                     val epoch = Clock.System.now().toEpochMilliseconds()
                     val outPath = path.substringBeforeLast(".mp4") + "_trimmed_${epoch}.mp4"
 
-                    val success = trimVideo(path, unskippedSegments, outPath)
+                    val captions = if (_captionPosition.value != org.example.project.domain.CaptionPosition.NONE) {
+                        parseScriptForBuffers(currentScript.content)
+                            .filter { !it.isBuffer }
+                            .map { CaptionInfo((it.startTimeSec * 1000).toLong(), (it.endTimeSec * 1000).toLong(), it.text) }
+                    } else {
+                        emptyList()
+                    }
+
+                    val success = trimVideo(
+                        inputPath = path, 
+                        unskippedSegments = unskippedSegments, 
+                        outputPath = outPath, 
+                        captions = captions, 
+                        captionPosition = _captionPosition.value
+                    )
                     
                     val updatedScript = currentScript.copy(
                         scriptState = "PUBLISHING_STUDIO",
-                        videoPath = if (success) outPath else path,
+                        publishedVideoPath = if (success) outPath else path, // Store the output in publishedVideoPath
+                        // DO NOT wipe the skippedSegmentsJson here, otherwise we can't revert after publishing if we go back!
                         skippedSegmentsJson = Json.encodeToString(_timelineBlocks.value)
                     )
                     scriptDao.update(updatedScript)
                     _activeScript.value = updatedScript
+                    _isProcessing.value = false
                     onSaved()
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    _isProcessing.value = false
                 }
             }
         }
@@ -283,6 +413,10 @@ class EditingStudioViewModel(
         
         return unskipped
     }
+
+    val hasModifications: StateFlow<Boolean> = _timelineBlocks.map { blocks ->
+        blocks.any { block -> block.subBlocks.any { it.isSkipped } }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     fun restoreOriginalVideo() {
         val currentBlocks = _timelineBlocks.value.map { block ->

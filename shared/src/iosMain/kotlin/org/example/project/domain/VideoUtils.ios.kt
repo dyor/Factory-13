@@ -8,7 +8,16 @@ import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.CoreMedia.CMTimeRangeMake
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
+import platform.CoreGraphics.CGRectMake
+import platform.CoreGraphics.CGSizeMake
+import platform.QuartzCore.CABasicAnimation
+import platform.QuartzCore.CALayer
+import platform.QuartzCore.CATextLayer
+import platform.QuartzCore.kCAAlignmentCenter
+import platform.UIKit.UIColor
+import platform.Foundation.NSNumber
 import kotlin.coroutines.resume
+import kotlinx.cinterop.readValue
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual suspend fun getVideoDuration(videoPath: String): Long {
@@ -23,7 +32,9 @@ actual suspend fun getVideoDuration(videoPath: String): Long {
 actual suspend fun trimVideo(
     inputPath: String,
     unskippedSegments: List<Pair<Long, Long>>,
-    outputPath: String
+    outputPath: String,
+    captions: List<CaptionInfo>,
+    captionPosition: CaptionPosition
 ): Boolean = suspendCancellableCoroutine { continuation ->
     val url = NSURL.fileURLWithPath(inputPath)
     val asset = AVURLAsset(uRL = url, options = null)
@@ -41,7 +52,11 @@ actual suspend fun trimVideo(
 
     var currentTime = CMTimeMake(0, 600)
     
+    // Map captions to the new timeline
+    val mappedCaptions = mutableListOf<CaptionInfo>()
+    var currentCompMs = 0L
     var success = true
+
     for (segment in unskippedSegments) {
         val startSeconds = segment.first / 1000.0
         val endSeconds = segment.second / 1000.0
@@ -64,23 +79,132 @@ actual suspend fun trimVideo(
             break
         }
         
+        // Process captions for this segment
+        val segDur = segment.second - segment.first
+        for (caption in captions) {
+            val overlapStart = maxOf(caption.startTimeMs, segment.first)
+            val overlapEnd = minOf(caption.endTimeMs, segment.second)
+            
+            if (overlapStart < overlapEnd) {
+                val mappedStart = currentCompMs + (overlapStart - segment.first)
+                val mappedEnd = currentCompMs + (overlapEnd - segment.first)
+                mappedCaptions.add(CaptionInfo(mappedStart, mappedEnd, caption.text))
+            }
+        }
+        currentCompMs += segDur
         currentTime = platform.CoreMedia.CMTimeAdd(currentTime, duration)
     }
 
-    if (!success) {
+    if (!success || compVideoTrack == null || videoTrack == null) {
         continuation.resume(false)
         return@suspendCancellableCoroutine
     }
 
+    val naturalSize = videoTrack.naturalSize
+    val transform = videoTrack.preferredTransform
+    val isRotated = transform.useContents { a == 0.0 && d == 0.0 }
+    val renderWidth = if (isRotated) naturalSize.useContents { height } else naturalSize.useContents { width }
+    val renderHeight = if (isRotated) naturalSize.useContents { width } else naturalSize.useContents { height }
+
+    // Build the video composition
+    val videoComposition = AVMutableVideoComposition.videoComposition()
+    videoComposition.setRenderSize(CGSizeMake(renderWidth, renderHeight))
+    videoComposition.setFrameDuration(CMTimeMake(1, 30))
+
+    val instruction = AVMutableVideoCompositionInstruction.videoCompositionInstruction()
+    instruction.setTimeRange(CMTimeRangeMake(platform.CoreMedia.kCMTimeZero.readValue(), composition.duration))
+
+    val layerInstruction = AVMutableVideoCompositionLayerInstruction.videoCompositionLayerInstructionWithAssetTrack(compVideoTrack)
+    layerInstruction.setTransform(videoTrack.preferredTransform, atTime = platform.CoreMedia.kCMTimeZero.readValue())
+    instruction.setLayerInstructions(listOf(layerInstruction))
+    videoComposition.setInstructions(listOf(instruction))
+
+    // Add CoreAnimation layers for captions if any exist
+    if (mappedCaptions.isNotEmpty()) {
+        val parentLayer = CALayer.layer()
+        val videoLayer = CALayer.layer()
+        val overlayLayer = CALayer.layer()
+        
+        parentLayer.frame = CGRectMake(0.0, 0.0, renderWidth, renderHeight)
+        videoLayer.frame = parentLayer.bounds
+        overlayLayer.frame = parentLayer.bounds
+        
+        parentLayer.addSublayer(videoLayer)
+        parentLayer.addSublayer(overlayLayer)
+        
+        for (caption in mappedCaptions) {
+            val textLayer = CATextLayer.layer()
+            textLayer.string = caption.text
+            val fontSize = renderHeight * 0.035 // Reduced font size for better fit
+            textLayer.fontSize = fontSize
+            textLayer.alignmentMode = kCAAlignmentCenter
+            textLayer.foregroundColor = UIColor.whiteColor.CGColor
+            textLayer.backgroundColor = UIColor.blackColor.colorWithAlphaComponent(0.6).CGColor
+            
+            textLayer.wrapped = true
+            textLayer.cornerRadius = 16.0
+            textLayer.masksToBounds = true
+            
+            // To properly size the text background we estimate text bounds
+            val padding = 40.0
+            val maxWidth = renderWidth - (padding * 2.0)
+            
+            // Estimate width and height
+            val estimatedCharWidth = fontSize * 0.55
+            val textLen = caption.text.length
+            val estimatedLineWidth = textLen * estimatedCharWidth
+            
+            val finalWidth = if (estimatedLineWidth < maxWidth) estimatedLineWidth + 40.0 else maxWidth
+            val maxCharsPerLine = (maxWidth / estimatedCharWidth)
+            val numLines = kotlin.math.ceil(textLen / maxCharsPerLine).toInt().coerceAtLeast(1)
+            
+            // Adjusted line height ratio to remove extra bottom padding
+            val finalHeight = (numLines * fontSize * 1.1) + 20.0 
+            
+            val xOffset = (renderWidth - finalWidth) / 2.0
+            
+            val yOffset = if (captionPosition == CaptionPosition.TOP) {
+                renderHeight * 0.70 // Brought top captions down slightly
+            } else {
+                renderHeight * 0.05 // Brought bottom captions much lower
+            }
+            
+            textLayer.frame = CGRectMake(xOffset, yOffset, finalWidth, finalHeight)
+            textLayer.opacity = 0.0f
+            
+            val anim = CABasicAnimation.animationWithKeyPath("opacity")
+            anim.fromValue = NSNumber(1.0)
+            anim.toValue = NSNumber(1.0)
+            anim.beginTime = platform.AVFoundation.AVCoreAnimationBeginTimeAtZero + (caption.startTimeMs / 1000.0)
+            anim.duration = (caption.endTimeMs - caption.startTimeMs) / 1000.0
+            anim.removedOnCompletion = true
+            
+            textLayer.addAnimation(anim, forKey = "opacityAnim")
+            overlayLayer.addSublayer(textLayer)
+        }
+        
+        videoComposition.setAnimationTool(AVVideoCompositionCoreAnimationTool.videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer(videoLayer, inLayer = parentLayer))
+    }
+
     val outputUrl = NSURL.fileURLWithPath(outputPath)
-    val exportSession = AVAssetExportSession(asset = composition, presetName = AVAssetExportPresetPassthrough)
+    
+    // Fall back to Passthrough if we aren't adding captions, 
+    // as it avoids the CameraRollValidation issue on iOS when simply trimming.
+    val preset = if (mappedCaptions.isNotEmpty()) AVAssetExportPresetHighestQuality else AVAssetExportPresetPassthrough
+    val exportSession = AVAssetExportSession(asset = composition, presetName = preset)
     
     exportSession.outputURL = outputUrl
     exportSession.outputFileType = AVFileTypeMPEG4
+    if (mappedCaptions.isNotEmpty()) {
+        exportSession.videoComposition = videoComposition
+    }
     exportSession.shouldOptimizeForNetworkUse = true
     
     exportSession.exportAsynchronouslyWithCompletionHandler {
         val finalSuccess = exportSession.status == AVAssetExportSessionStatusCompleted
+        if (!finalSuccess) {
+            println("Export failed with error: ${exportSession.error?.localizedDescription}")
+        }
         continuation.resume(finalSuccess)
     }
 }

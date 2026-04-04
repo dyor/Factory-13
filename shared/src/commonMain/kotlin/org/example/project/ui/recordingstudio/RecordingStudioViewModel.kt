@@ -14,7 +14,8 @@ import org.example.project.domain.ScriptDao
 data class ScriptSegment(
     val startTimeSec: Int,
     val endTimeSec: Int,
-    val text: String
+    val text: String,
+    val isBuffer: Boolean = false
 )
 
 class RecordingStudioViewModel(
@@ -38,6 +39,9 @@ class RecordingStudioViewModel(
 
     private val _currentSegmentText = MutableStateFlow("")
     val currentSegmentText: StateFlow<String> = _currentSegmentText.asStateFlow()
+
+    private val _isCurrentSegmentBuffer = MutableStateFlow(false)
+    val isCurrentSegmentBuffer: StateFlow<Boolean> = _isCurrentSegmentBuffer.asStateFlow()
 
     private val _totalTimeRemainingSec = MutableStateFlow(0)
     val totalTimeRemainingSec: StateFlow<Int> = _totalTimeRemainingSec.asStateFlow()
@@ -81,25 +85,39 @@ class RecordingStudioViewModel(
         val lines = content.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
         val parsedSegments = mutableListOf<ScriptSegment>()
         
-        var fallbackTime = 0
-        for (line in lines) {
+        var runningTime = 0
+        
+        for ((index, line) in lines.withIndex()) {
             val match = regex.find(line)
+            val text: String
+            val duration: Int
+            
             if (match != null) {
-                val start = match.groupValues[1].toInt()
-                val end = match.groupValues[2].toInt()
-                val text = match.groupValues[3]
-                parsedSegments.add(ScriptSegment(start, end, text))
-                fallbackTime = end
+                val parsedStart = match.groupValues[1].toInt()
+                val parsedEnd = match.groupValues[2].toInt()
+                duration = maxOf(1, parsedEnd - parsedStart)
+                text = match.groupValues[3]
             } else {
-                parsedSegments.add(ScriptSegment(fallbackTime, fallbackTime + 5, line))
-                fallbackTime += 5
+                duration = 5
+                text = line
+            }
+            
+            val segStart = runningTime
+            val segEnd = runningTime + duration
+            parsedSegments.add(ScriptSegment(segStart, segEnd, text, isBuffer = false))
+            runningTime = segEnd
+            
+            // Add a 2-second buffer between segments using the same text but marked as buffer
+            if (index < lines.lastIndex) {
+                parsedSegments.add(ScriptSegment(runningTime, runningTime + 2, text, isBuffer = true))
+                runningTime += 2
             }
         }
         
         // Add a 5-second buffer segment at the end so the speaker doesn't get cut off
         if (parsedSegments.isNotEmpty()) {
             val lastTime = parsedSegments.last().endTimeSec
-            parsedSegments.add(ScriptSegment(lastTime, lastTime + 5, "...and cut!"))
+            parsedSegments.add(ScriptSegment(lastTime, lastTime + 5, "...and cut!", isBuffer = true))
         }
         
         return parsedSegments
@@ -128,9 +146,14 @@ class RecordingStudioViewModel(
     }
 
     fun stopRecording() {
+        if (_isFinished.value) return // Prevent multiple calls
+        
         _isRecording.value = false
         _isFinished.value = true
-        teleprompterJob?.cancel()
+        
+        val job = teleprompterJob
+        teleprompterJob = null
+        job?.cancel()
         
         val actualSecs = (actualElapsedMs + 999) / 1000
         val currentScript = _activeScript.value
@@ -167,6 +190,7 @@ class RecordingStudioViewModel(
                     ?: currentSegments.last() // Fallback to last segment if outside defined ranges
 
                 _currentSegmentText.value = currentSeg.text
+                _isCurrentSegmentBuffer.value = currentSeg.isBuffer
                 
                 val totalRemaining = maxOf(0L, (totalDurationMs - actualElapsedMs) / 1000).toInt()
                 _totalTimeRemainingSec.value = totalRemaining
@@ -192,6 +216,11 @@ class RecordingStudioViewModel(
                 delay(tickMs)
                 actualElapsedMs += tickMs
             }
+            
+            // The teleprompter is done. Give the camera plugin and audio buffer a substantial amount of time to flush
+            // before we kill the recording state, which stops the plugin. 
+            // 500ms may not be enough for some devices under load. We'll use 1.5s to be safe.
+            delay(1500)
             stopRecording()
         }
     }
@@ -201,7 +230,7 @@ class RecordingStudioViewModel(
         if (currentScript != null) {
             viewModelScope.launch {
                 val updatedScript = currentScript.copy(
-                    videoPath = filePath, 
+                    videoPath = filePath,
                     scriptState = "RECORDING_STUDIO",
                     skippedSegmentsJson = ""
                 )

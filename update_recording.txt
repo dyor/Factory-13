@@ -36,11 +36,9 @@ import kotlinproject.shared.generated.resources.film_noir
 import org.jetbrains.compose.resources.painterResource
 import kotlinx.coroutines.delay
 import org.example.project.ui.components.NativeCameraView
-import org.example.project.ui.components.StudioBottomNavigationRow
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordingStudioScreen(
     viewModel: RecordingStudioViewModel,
@@ -63,7 +61,6 @@ fun RecordingStudioScreen(
 
     // Controls visibility
     var showControls by remember { mutableStateOf(true) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -174,18 +171,14 @@ fun RecordingStudioScreen(
                     }
                 } else {
                     // Ready to record state
-                    Column(
+                    Text(
+                        text = "Recording Studio",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSurface, // Themed White
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f), RoundedCornerShape(12.dp)) // Themed background
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Recording Studio",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.onSurface // Themed White
-                        )
-                    }
+                            .padding(24.dp)
+                    )
                 }
             }
 
@@ -211,7 +204,7 @@ fun RecordingStudioScreen(
                 )
 
                 // Controls Overlay
-                if (!isRecording && !isCountingDown) {
+                if (showControls || (!isRecording && !isCountingDown)) {
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
@@ -221,6 +214,41 @@ fun RecordingStudioScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         if (isFinished || (activeScript?.videoPath != null && !isRecording && !isCountingDown)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = onNavigateBack,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
+                                ) {
+                                    Text("←", fontSize = 20.sp)
+                                }
+
+                                OutlinedButton(
+                                    onClick = { showArchiveDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
+                                ) {
+                                    Text("↓", fontSize = 20.sp)
+                                }
+
+                                OutlinedButton(
+                                    onClick = onNavigateForward,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), // Themed Gold
+                                        contentColor = MaterialTheme.colorScheme.primary // Themed Gold
+                                    ),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
+                                ) {
+                                    Text("Edit →")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                             OutlinedButton(
                                 onClick = { showReRecordDialog = true },
                                 modifier = Modifier.fillMaxWidth(),
@@ -229,66 +257,67 @@ fun RecordingStudioScreen(
                             ) {
                                 Text("Re-Record ↺", fontSize = 16.sp)
                             }
+                        } else if (!isRecording && !isCountingDown) {
+                            OutlinedButton(
+                                onClick = { viewModel.startRecordingProcess() },
+                                enabled = activeScript != null,
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), // Themed Gold
+                                    contentColor = MaterialTheme.colorScheme.primary, // Themed Gold
+                                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Gray
+                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) // Themed Dark Gray
+                                ),
+                                border = BorderStroke(1.dp, if(activeScript != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) // Themed border
+                            ) {
+                                Text("Start Recording")
+                            }
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            StudioBottomNavigationRow(
-                                onBack = onNavigateBack,
-                                onArchive = { showArchiveDialog = true },
-                                actionText = "Edit →",
-                                onAction = onNavigateForward
-                            )
-                        } else {
-                            StudioBottomNavigationRow(
-                                onBack = onNavigateBack,
-                                onArchive = { showArchiveDialog = true },
-                                actionText = "Start",
-                                actionEnabled = activeScript != null,
-                                onAction = { viewModel.startRecordingProcess() }
-                            )
-                        }
-                    }
-                }
-            }
-        }
 
-        // Recording Controls Modal Bottom Sheet
-        if (showControls && (isRecording || isCountingDown)) {
-            ModalBottomSheet(
-                onDismissRequest = { showControls = false },
-                sheetState = sheetState,
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                scrimColor = Color.Transparent, // Transparent so the user still sees the camera and teleprompter
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 48.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.reset() // Takes us back to WRITERS_ROOM state without destroying
-                                onNavigateBack()
-                            },
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                        ) {
-                            Text("✎ Edit Script", fontSize = 16.sp)
-                        }
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                OutlinedButton(
+                                    onClick = onNavigateBack,
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
+                                ) {
+                                    Text("←", fontSize = 20.sp)
+                                }
 
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        OutlinedButton(
-                            onClick = { viewModel.stopRecording() },
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                            ),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                        ) {
-                            Text("✓ Stop Early", fontSize = 16.sp)
+                                OutlinedButton(
+                                    onClick = { showArchiveDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
+                                ) {
+                                    Text("↓", fontSize = 20.sp)
+                                }
+
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        } else if (isRecording || isCountingDown) {
+                            OutlinedButton(
+                                onClick = { viewModel.stopRecording() },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.7f), // Themed Dark Red
+                                    contentColor = MaterialTheme.colorScheme.onSurface, // Themed White
+                                ),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error) // Themed Red
+                            ) {
+                                Text("Stop Early", color = MaterialTheme.colorScheme.onSurface) // Themed White
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            OutlinedButton(
+                                onClick = { showControls = false },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
+                            ) {
+                                Text("Hide Controls", color = MaterialTheme.colorScheme.onSurface)
+                            }
                         }
                     }
                 }

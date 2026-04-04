@@ -2,13 +2,16 @@
 <journey name="Recording Studio">
     <description>Verify that the user can record video using the front-facing camera while following the teleprompter.</description>
     <actions xml:space="preserve">
-        <action>If the screen does not say "Recording Studio" click on the Writer's Studio button and then the Record button.</action>
+        <action>Tap the "Writer's Room" button.</action>
+        <action>Adjust the slider to set the Target Duration to about 10s.</action>
+        <action>Enter "0s-4s: Hello KMP Developers. 4s-10s: This is a sample script." into the Generated Script Content text box.</action>
+        <action>Tap the "Record" button to proceed to the Recording Studio.</action>
         <action>Ensure that the top half of the screen displays the previously saved script.</action>
         <action>Check that the bottom half of the screen shows the live front-facing camera view.</action>
         <action>Tap 'Start Recording' to begin.</action>
         <action>Wait for the 5-second countdown to finish.</action>
-        <action>Verify that the teleprompter advances correctly based on the target duration timestamps.</action>
-        <action>Check that two counters exist counting down the remaining time for the current caption and the entire video.</action>
+        <action>Verify that the teleprompter advances correctly based on the target duration timestamps and finishes at 15 seconds (given the 5 second buffer  the end).</action>
+        <action>Check that the visual timeline advances automatically counting down the remaining time for the entire video (the duration + 5 second buffer).</action>
         <action>When recording completes, verify that navigation option 'Edit' appears.</action>
         <action>Tap 'Edit' to advance to the next screen.</action>
         <action>Verify that the screen title is now "Editing Studio".</action>

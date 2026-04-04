@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextOverflow
 import org.example.project.domain.resolveVideoPath
+import org.example.project.ui.components.PlayPauseReplayButton
+import org.example.project.ui.components.StudioBottomNavigationRow
 import org.example.project.ui.components.VideoPlayer
 
 @Composable
@@ -48,7 +49,7 @@ fun PublishingStudioScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (activeScript?.videoPath == null) {
+        if (activeScript?.videoPath == null && activeScript?.publishedVideoPath == null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
@@ -67,7 +68,7 @@ fun PublishingStudioScreen(
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp))
                     .padding(8.dp)
             ) {
-                val videoPath = activeScript!!.videoPath!!
+                val videoPath = activeScript!!.publishedVideoPath ?: activeScript!!.videoPath!!
                 val resolvedPath = resolveVideoPath(videoPath)
                 VideoPlayer(
                     modifier = Modifier.fillMaxSize(),
@@ -99,62 +100,23 @@ fun PublishingStudioScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val playButtonText = when {
-                    isPlaybackCompleted -> "Replay"
-                    isPlaying -> "Pause"
-                    else -> "Play"
-                }
-
-                OutlinedButton(
-                    onClick = { viewModel.togglePlayPause() }, 
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(playButtonText, maxLines = 1)
-                }
+                PlayPauseReplayButton(
+                    isPlaying = isPlaying,
+                    isPlaybackCompleted = isPlaybackCompleted,
+                    onTogglePlayPause = { viewModel.togglePlayPause() },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                    OutlinedButton(
-                        onClick = { viewModel.shareCurrentVideo() },
-                        modifier = Modifier.fillMaxWidth().height(48.dp), // Smaller height
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                            contentColor = MaterialTheme.colorScheme.primary
-                        ),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Export / Share ↑", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    }
-                
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedButton(
-                            onClick = onNavigateBack, 
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text("←", maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        OutlinedButton(
-                            onClick = { viewModel.markAsPublished { onNavigateHome() } },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text("↓ Archive", maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                    }
+                StudioBottomNavigationRow(
+                    onBack = onNavigateBack,
+                    onArchive = { viewModel.markAsPublished { onNavigateHome() } },
+                    actionText = "Export ↑",
+                    onAction = { viewModel.shareCurrentVideo() }
+                )
             }
         }
     }

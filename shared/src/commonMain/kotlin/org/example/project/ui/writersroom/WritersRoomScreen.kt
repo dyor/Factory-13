@@ -100,7 +100,7 @@ fun WritersRoomScreen(
                         value = targetDuration.toFloat(),
                         onValueChange = { viewModel.updateTargetDuration(it.toInt()) },
                         valueRange = 5f..60f,
-                        steps = 54,
+                        steps = 10, // Gives 5-second increments: 5, 10, 15, ..., 60
                         colors = SliderDefaults.colors(
                             thumbColor = MaterialTheme.colorScheme.primary, // Themed Gold
                             activeTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f), // Themed Gold
@@ -163,49 +163,17 @@ fun WritersRoomScreen(
         }
 
         if (!promptHasFocus) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(16.dp)) // Themed background
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                OutlinedButton(
-                    onClick = onNavigateBack,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
-                ) {
-                    Text("←", fontSize = 20.sp)
-                }
-
-                if (activeScript != null) {
-                    OutlinedButton(
-                        onClick = { showArchiveDialog = true },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary), // Themed Gold
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Themed border
-                    ) {
-                        Text("↓", fontSize = 20.sp)
+            org.example.project.ui.components.StudioBottomNavigationRow(
+                onBack = onNavigateBack,
+                onArchive = if (activeScript != null) { { showArchiveDialog = true } } else null,
+                actionText = "Record →",
+                actionEnabled = generatedScript.isNotBlank() && !isGenerating,
+                onAction = {
+                    viewModel.saveScript {
+                        onNavigateToRecording()
                     }
                 }
-                
-                OutlinedButton(
-                    onClick = { 
-                        viewModel.saveScript {
-                            onNavigateToRecording()
-                        }
-                    },
-                    enabled = generatedScript.isNotBlank() && !isGenerating,
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), // Themed Gold
-                        contentColor = MaterialTheme.colorScheme.primary, // Themed Gold
-                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant, // Themed Gray
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) // Themed Dark Gray
-                    ),
-                    border = BorderStroke(1.dp, if(generatedScript.isNotBlank() && !isGenerating) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) // Themed border
-                ) {
-                    Text("Record →", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
-            }
+            )
         }
 
         if (showArchiveDialog) {

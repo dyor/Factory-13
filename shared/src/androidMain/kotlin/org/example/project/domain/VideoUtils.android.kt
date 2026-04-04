@@ -24,7 +24,9 @@ actual suspend fun getVideoDuration(videoPath: String): Long {
 actual suspend fun trimVideo(
     inputPath: String,
     unskippedSegments: List<Pair<Long, Long>>,
-    outputPath: String
+    outputPath: String,
+    captions: List<CaptionInfo>,
+    captionPosition: CaptionPosition
 ): Boolean {
     val extractor = MediaExtractor()
     var muxer: MediaMuxer? = null
