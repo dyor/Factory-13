@@ -13,6 +13,8 @@ data class CaptionInfo(
 /**
  * Expected functions to access native media processing capabilities.
  */
+expect val isCaptionsSupported: Boolean
+
 expect suspend fun getVideoDuration(videoPath: String): Long
 
 expect suspend fun trimVideo(

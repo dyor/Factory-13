@@ -20,6 +20,9 @@ import kotlin.coroutines.resume
 import kotlinx.cinterop.readValue
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+actual val isCaptionsSupported: Boolean = true
+
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 actual suspend fun getVideoDuration(videoPath: String): Long {
     val url = NSURL.fileURLWithPath(videoPath)
     val asset = AVURLAsset(uRL = url, options = null)
@@ -145,21 +148,36 @@ actual suspend fun trimVideo(
             textLayer.cornerRadius = 16.0
             textLayer.masksToBounds = true
             
-            // To properly size the text background we estimate text bounds
+            // To prevent text from being too close to the edges of the box, we can use a container
+            val containerLayer = CALayer.layer()
+            containerLayer.backgroundColor = UIColor.blackColor.colorWithAlphaComponent(0.6).CGColor
+            containerLayer.cornerRadius = 16.0
+            containerLayer.masksToBounds = true
+
+            // Set the background of text layer to transparent so the container handles the background
+            textLayer.backgroundColor = UIColor.clearColor.CGColor
+            
             val padding = 40.0
             val maxWidth = renderWidth - (padding * 2.0)
             
-            // Estimate width and height
-            val estimatedCharWidth = fontSize * 0.55
+            // Estimate width and height based on system font proportions.
+            val estimatedCharWidth = fontSize * 0.6
             val textLen = caption.text.length
             val estimatedLineWidth = textLen * estimatedCharWidth
             
-            val finalWidth = if (estimatedLineWidth < maxWidth) estimatedLineWidth + 40.0 else maxWidth
-            val maxCharsPerLine = (maxWidth / estimatedCharWidth)
+            // Inner padding for the container
+            val horizontalPadding = 32.0
+            val verticalPadding = 24.0
+
+            val textMaxWidth = maxWidth - horizontalPadding
+            val finalWidth = if (estimatedLineWidth < textMaxWidth) estimatedLineWidth + horizontalPadding else maxWidth
+            
+            val maxCharsPerLine = (textMaxWidth / estimatedCharWidth)
             val numLines = kotlin.math.ceil(textLen / maxCharsPerLine).toInt().coerceAtLeast(1)
             
-            // Adjusted line height ratio to remove extra bottom padding
-            val finalHeight = (numLines * fontSize * 1.1) + 20.0 
+            // CATextLayer draws from the top. We calculate the height to match the text height + minimum padding.
+            val textHeight = (numLines * fontSize * 1.2)
+            val finalHeight = textHeight + verticalPadding
             
             val xOffset = (renderWidth - finalWidth) / 2.0
             
@@ -169,8 +187,14 @@ actual suspend fun trimVideo(
                 renderHeight * 0.05 // Brought bottom captions much lower
             }
             
-            textLayer.frame = CGRectMake(xOffset, yOffset, finalWidth, finalHeight)
-            textLayer.opacity = 0.0f
+            containerLayer.frame = CGRectMake(xOffset, yOffset, finalWidth, finalHeight)
+            
+            // Vertically center the text within the container
+            val textYOffset = (finalHeight - textHeight) / 2.0
+            textLayer.frame = CGRectMake(horizontalPadding / 2.0, textYOffset, finalWidth - horizontalPadding, textHeight)
+            
+            containerLayer.addSublayer(textLayer)
+            containerLayer.opacity = 0.0f
             
             val anim = CABasicAnimation.animationWithKeyPath("opacity")
             anim.fromValue = NSNumber(1.0)
@@ -179,8 +203,8 @@ actual suspend fun trimVideo(
             anim.duration = (caption.endTimeMs - caption.startTimeMs) / 1000.0
             anim.removedOnCompletion = true
             
-            textLayer.addAnimation(anim, forKey = "opacityAnim")
-            overlayLayer.addSublayer(textLayer)
+            containerLayer.addAnimation(anim, forKey = "opacityAnim")
+            overlayLayer.addSublayer(containerLayer)
         }
         
         videoComposition.setAnimationTool(AVVideoCompositionCoreAnimationTool.videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer(videoLayer, inLayer = parentLayer))

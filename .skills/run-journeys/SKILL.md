@@ -8,7 +8,7 @@ description: Automates running Journey tests and subsequently extracting their r
 When a user asks to run a journey (e.g., "run the writers room journey"), follow these steps:
 
 ## Step 1: Run the Journey Test
-1. Determine the journey file name (e.g., `writers_room.journey.xml`). You can omit the `.journey.xml` extension when determining the `<journey_name>` base.
+1. Determine the journey file name (e.g., `1_writers_room.journey.xml`). You can omit the `.journey.xml` extension when determining the `<journey_name>` base.
 2. Execute the Gradle command to run the specific journey:
    `run_shell_command("JOURNEYS_FILTER=<journey_name>.journey.xml ./gradlew :androidApp:testJourneysTestDefaultDebugTestSuite")`
    *(Note: Adjust `:androidApp:` if the target module is different).*

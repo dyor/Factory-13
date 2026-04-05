@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.example.project.domain.Script
 import org.example.project.domain.ScriptDao
+import kotlin.time.Clock
 
 data class ScriptSegment(
     val startTimeSec: Int,
@@ -63,6 +64,12 @@ class RecordingStudioViewModel(
     init {
         viewModelScope.launch {
             scriptDao.getActiveScript().collect { script ->
+                if (script != null && script.scriptState == "WRITERS_ROOM") {
+                    val updatedScript = script.copy(scriptState = "RECORDING_STUDIO")
+                    scriptDao.update(updatedScript)
+                    return@collect
+                }
+
                 _activeScript.value = script
                 if (script != null) {
                     val parsed = parseScript(script.content)
@@ -81,43 +88,40 @@ class RecordingStudioViewModel(
     }
 
     private fun parseScript(content: String): List<ScriptSegment> {
-        val regex = Regex("""^(\d+)s-(\d+)s:?\s*(.*)$""")
-        val lines = content.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
-        val parsedSegments = mutableListOf<ScriptSegment>()
+        // Find all occurrences of "Xs-Ys:" anywhere in the text to support both newlines and single-line typing.
+        val regex = Regex("""(\d+)s-(\d+)s:?\s*(.*?)((?=\d+s-\d+s:)|\Z)""")
+        val matches = regex.findAll(content.replace("\n", " ")).toList()
         
+        val parsedSegments = mutableListOf<ScriptSegment>()
         var runningTime = 0
         
-        for ((index, line) in lines.withIndex()) {
-            val match = regex.find(line)
-            val text: String
-            val duration: Int
-            
-            if (match != null) {
+        if (matches.isNotEmpty()) {
+            for (match in matches) {
                 val parsedStart = match.groupValues[1].toInt()
                 val parsedEnd = match.groupValues[2].toInt()
-                duration = maxOf(1, parsedEnd - parsedStart)
-                text = match.groupValues[3]
-            } else {
-                duration = 5
-                text = line
-            }
-            
-            val segStart = runningTime
-            val segEnd = runningTime + duration
-            parsedSegments.add(ScriptSegment(segStart, segEnd, text, isBuffer = false))
-            runningTime = segEnd
-            
-            // Add a 2-second buffer between segments using the same text but marked as buffer
-            if (index < lines.lastIndex) {
+                val duration = maxOf(1, parsedEnd - parsedStart)
+                val text = match.groupValues[3].trim()
+                
+                val segStart = runningTime
+                val segEnd = runningTime + duration
+                parsedSegments.add(ScriptSegment(segStart, segEnd, text, isBuffer = false))
+                runningTime = segEnd
+                
+                // Add a 2-second buffer after every segment
                 parsedSegments.add(ScriptSegment(runningTime, runningTime + 2, text, isBuffer = true))
                 runningTime += 2
             }
-        }
-        
-        // Add a 5-second buffer segment at the end so the speaker doesn't get cut off
-        if (parsedSegments.isNotEmpty()) {
-            val lastTime = parsedSegments.last().endTimeSec
-            parsedSegments.add(ScriptSegment(lastTime, lastTime + 5, "...and cut!", isBuffer = true))
+        } else {
+            // Fallback if no timestamps are found at all
+            val lines = content.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+            for (line in lines) {
+                val segStart = runningTime
+                val segEnd = runningTime + 5
+                parsedSegments.add(ScriptSegment(segStart, segEnd, line, isBuffer = false))
+                runningTime = segEnd
+                parsedSegments.add(ScriptSegment(runningTime, runningTime + 2, line, isBuffer = true))
+                runningTime += 2
+            }
         }
         
         return parsedSegments
@@ -180,8 +184,16 @@ class RecordingStudioViewModel(
         teleprompterJob = viewModelScope.launch {
             actualElapsedMs = 0L
             val tickMs = 100L
+            val startTimeMs = Clock.System.now().toEpochMilliseconds()
 
-            while (actualElapsedMs <= totalDurationMs) {
+            while (true) {
+                val now = Clock.System.now().toEpochMilliseconds()
+                actualElapsedMs = now - startTimeMs
+                
+                if (actualElapsedMs > totalDurationMs) {
+                    break
+                }
+
                 val currentSec = (actualElapsedMs / 1000).toInt()
                 
                 // Find current segment
@@ -214,7 +226,6 @@ class RecordingStudioViewModel(
                 }
 
                 delay(tickMs)
-                actualElapsedMs += tickMs
             }
             
             // The teleprompter is done. Give the camera plugin and audio buffer a substantial amount of time to flush
@@ -244,7 +255,7 @@ class RecordingStudioViewModel(
         val currentScript = _activeScript.value
         if (currentScript != null) {
             viewModelScope.launch {
-                val updatedScript = currentScript.copy(scriptState = "ARCHIVED")
+                val updatedScript = currentScript.copy(isActive = false)
                 scriptDao.update(updatedScript)
                 _activeScript.value = null
             }

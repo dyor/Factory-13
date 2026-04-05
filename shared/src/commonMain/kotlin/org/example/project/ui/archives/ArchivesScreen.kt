@@ -85,36 +85,19 @@ fun ArchivesScreen(
         AlertDialog(
             onDismissRequest = { selectedScript = null },
             title = { Text("Restore Project") },
-            text = { Text("Where would you like to resume this project? \n\nRestoring to the Writer's Room will keep your recorded video unless you generate a new script.", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+            text = { Text("Are you sure you want to restore this project to its last active stage (${script.scriptState.replace("_", " ")})?", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             confirmButton = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.makeScriptActive(script) {
-                                onNavigateToStudio("WRITERS_ROOM")
-                            }
-                            selectedScript = null
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Restore to Writer's Room")
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.makeScriptActive(script) { state ->
-                                onNavigateToStudio(state)
-                            }
-                            selectedScript = null
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface)
-                    ) {
-                        Text("Restore to Last Stage")
-                    }
+                OutlinedButton(
+                    onClick = {
+                        viewModel.makeScriptActive(script) { state ->
+                            onNavigateToStudio(state)
+                        }
+                        selectedScript = null
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Yes, Restore")
                 }
             },
             dismissButton = {

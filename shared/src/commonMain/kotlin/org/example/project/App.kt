@@ -124,7 +124,10 @@ fun App() {
                                 RecordingStudioScreen(
                                     viewModel = recordingViewModel,
                                     onNavigateBack = { onNavigateHome() },
-                                    onNavigateForward = { backStack.add(Screen.EditingStudio) }
+                                    onNavigateForward = { backStack.add(Screen.EditingStudio) },
+                                    onNavigateToWritersRoom = { 
+                                        backStack.add(Screen.WritersRoom) 
+                                    }
                                 )
                             }
                             entry<Screen.EditingStudio> {

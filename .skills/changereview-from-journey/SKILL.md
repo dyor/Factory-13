@@ -30,10 +30,15 @@ When a user invokes you with **"run changereview on <journey_name>"** or a simil
 
 ## Step 5: Generate the Change Review Report
 1. Synthesize the parsed text and the copied images into a highly readable Markdown document.
-2. Use the `write_file` tool to save the report to: `.changereview/<journey_name>/changereview.md`
-3. Structure the Markdown as follows:
+2. Determine the overall Pass/Fail status by evaluating the result states of the steps (if any step resulted in "Failed" or "Could not successfully complete", the overall status is **FAIL**. Otherwise, it is **PASS**).
+3. Retrieve the current date and time (e.g. by running the `date` shell command).
+4. Use the `write_file` tool to save the report to: `.changereview/<journey_name>/changereview.md`
+5. Structure the Markdown exactly as follows:
    * Document Title: `# <Journey Name> Change Review`
-   * Metadata: Journey File, Device Tested.
+   * Metadata & Status (Prominently displayed right under the title as a bulleted list to prevent markdown line-collapsing):
+     * `* **Date/Time:** <Current Date and Time>`
+     * `* **Overall Status:** **[PASS]** (or **[FAIL]**)`
+     * `* **Device Tested:** <Device ID>`
    * A sequential breakdown of every step attempted. For each step, include:
      * **Step Action/Goal**
      * **Result** (e.g., Goal Complete / Failed)

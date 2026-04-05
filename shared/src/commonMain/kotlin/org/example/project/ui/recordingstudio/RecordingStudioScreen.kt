@@ -45,7 +45,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 fun RecordingStudioScreen(
     viewModel: RecordingStudioViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateForward: () -> Unit
+    onNavigateForward: () -> Unit,
+    onNavigateToWritersRoom: () -> Unit = onNavigateBack // Default to fallback if not provided
 ) {
     val activeScript by viewModel.activeScript.collectAsState()
     val isRecording by viewModel.isRecording.collectAsState()
@@ -269,7 +270,7 @@ fun RecordingStudioScreen(
                         OutlinedButton(
                             onClick = {
                                 viewModel.reset() // Takes us back to WRITERS_ROOM state without destroying
-                                onNavigateBack()
+                                onNavigateToWritersRoom()
                             },
                             modifier = Modifier.weight(1f).height(56.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),

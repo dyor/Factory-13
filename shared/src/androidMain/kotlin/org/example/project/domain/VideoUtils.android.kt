@@ -8,6 +8,8 @@ import android.media.MediaMuxer
 import java.io.File
 import java.nio.ByteBuffer
 
+actual val isCaptionsSupported: Boolean = false
+
 actual suspend fun getVideoDuration(videoPath: String): Long {
     val retriever = MediaMetadataRetriever()
     return try {

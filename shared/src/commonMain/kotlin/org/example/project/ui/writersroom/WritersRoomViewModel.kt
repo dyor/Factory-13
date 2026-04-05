@@ -112,7 +112,7 @@ class WritersRoomViewModel(
         val currentScript = _activeScript.value
         if (currentScript != null) {
             viewModelScope.launch {
-                val updatedScript = currentScript.copy(scriptState = "ARCHIVED")
+                val updatedScript = currentScript.copy(isActive = false)
                 scriptDao.update(updatedScript)
                 _activeScript.value = null
                 _promptContent.value = ""

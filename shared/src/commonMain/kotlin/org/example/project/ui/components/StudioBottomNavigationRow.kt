@@ -11,6 +11,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+
 @Composable
 fun StudioBottomNavigationRow(
     onBack: () -> Unit,
@@ -28,11 +31,11 @@ fun StudioBottomNavigationRow(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp) // Increased spacing slightly
         ) {
             OutlinedButton(
                 onClick = onBack,
-                modifier = Modifier.width(64.dp).height(48.dp),
+                modifier = Modifier.width(64.dp).height(48.dp).semantics { contentDescription = "Go Back Button" },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                 contentPadding = PaddingValues(0.dp)
@@ -43,7 +46,7 @@ fun StudioBottomNavigationRow(
             if (onArchive != null) {
                 OutlinedButton(
                     onClick = onArchive,
-                    modifier = Modifier.width(64.dp).height(48.dp),
+                    modifier = Modifier.width(64.dp).height(48.dp).semantics { contentDescription = "Archive Button" },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     contentPadding = PaddingValues(0.dp)
@@ -55,7 +58,7 @@ fun StudioBottomNavigationRow(
             OutlinedButton(
                 onClick = onAction,
                 enabled = actionEnabled,
-                modifier = Modifier.weight(1f).height(48.dp),
+                modifier = Modifier.weight(1f).height(48.dp).semantics { contentDescription = actionText },
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     contentColor = MaterialTheme.colorScheme.primary,

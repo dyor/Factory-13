@@ -6,17 +6,35 @@ Film Factory is a **Kotlin Multiplatform (KMP)** application that helps creators
 
 Film Factory provides a complete studio experience right on your device, seamlessly flowing through these core stages:
 
-*   **Writer's Room**: Got an idea? Enter a prompt (e.g., "Teach people to do pushups") and set your target duration. The app uses Gemini AI to generate a properly paced script with timestamps (e.g., "0s-5s"). You can freely edit the generated text before moving on.
-*   **Recording Studio**: A built-in teleprompter syncs with your script's timestamps. Record using the front-facing camera while the teleprompter guides you, complete with countdowns for each caption and the overall video length.
+*   **Writer's Room**: Got an idea? Enter a prompt and set your target duration. The app uses Gemini AI to generate a properly paced script with timestamps (e.g., "0s-5s"). You can freely edit the generated text before moving on.
+*   **Recording Studio**: A built-in teleprompter syncs with your script's timestamps. Record using a custom native `UIKitView` / `AndroidView` front-facing camera integration while the teleprompter guides you, complete with countdowns and buffered transition segments.
 *   **Editing Studio**: After recording, dive into a precision timeline. Fine-tune your clips by selecting blocks in tenth-of-a-second increments. Mark mistakes or bad takes to easily skip and remove them from the final cut.
-*   **Publishing Studio**: Preview your cleanly trimmed video (skipping the removed frames) and seamlessly export or share it directly to external channels like YouTube Shorts or your native Photos app.
-*   **Archives**: Need to revisit a past project? The Archives let you see past videos or scripts and restore an archived project to active status to resume editing.
+*   **Publishing Studio**: Preview your cleanly trimmed video (automatically stitching past your removed frames) and seamlessly export or share it directly to external channels like YouTube Shorts or your native Photos app. Hard-coded multi-line captions are cleanly rendered into the final AV export using `CoreAnimation` / `MediaMuxer` logic.
+*   **Archives**: Need to revisit a past project? The Archives let you see past videos or scripts and restore an archived project to its exact active status to resume editing.
 
 ### Writer's Room Flow
 
 | Enter Prompt & Duration | Generate Script | Edit & Proceed |
 |:---:|:---:|:---:|
-| <img src=".changereview/writers_room/images/displayState4.png" width="200" alt="Prompt Idea"/> | <img src=".changereview/writers_room/images/displayState7.png" width="200" alt="Generated Script"/> | <img src=".changereview/writers_room/images/displayState11.png" width="200" alt="Edit Script"/> |
+| ![](.changereview/1_writers_room/images/displayState4.png) | ![](.changereview/1_writers_room/images/displayState7.png) | ![](.changereview/1_writers_room/images/displayState10.png) |
+
+### Recording Studio Flow
+
+| Start Recording | Teleprompter Progress | Stop & Advance |
+|:---:|:---:|:---:|
+| ![](.changereview/4_publishing_studio/images/displayState6.png) | ![](.changereview/4_publishing_studio/images/displayState8.png) | ![](.changereview/4_publishing_studio/images/displayState9.png) |
+
+### Editing Studio Flow
+
+| Fine-Tune Timeline | Mark Bad Takes | Preview Trims |
+|:---:|:---:|:---:|
+| ![](.changereview/4_publishing_studio/images/displayState11.png) | ![](.changereview/4_publishing_studio/images/displayState13.png) | ![](.changereview/4_publishing_studio/images/displayState15.png) |
+
+### Publishing Studio Flow
+
+| Final Preview | Play Clean Cut | Export / Share |
+|:---:|:---:|:---:|
+| ![](.changereview/4_publishing_studio/images/displayState17.png) | ![](.changereview/4_publishing_studio/images/displayState18.png) | ![](.changereview/4_publishing_studio/images/displayState21.png) |
 
 ---
 

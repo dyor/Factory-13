@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,7 +37,16 @@ fun WritersRoomScreen(
     val focusManager = LocalFocusManager.current
     var promptHasFocus by remember { mutableStateOf(false) }
     var scriptHasFocus by remember { mutableStateOf(false) }
+    val scriptFocusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
+    
+    LaunchedEffect(generatedScript) {
+        if (generatedScript.isNotBlank() && !scriptHasFocus && !promptHasFocus) {
+            try {
+                scriptFocusRequester.requestFocus()
+            } catch (_: Exception) {}
+        }
+    }
     
     var showArchiveDialog by remember { mutableStateOf(false) }
 
@@ -147,6 +158,7 @@ fun WritersRoomScreen(
                     .fillMaxWidth()
                     .heightIn(min = 250.dp)
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), RoundedCornerShape(8.dp)) // Themed background
+                    .focusRequester(scriptFocusRequester)
                     .onFocusChanged { scriptHasFocus = it.isFocused },
                 label = { Text("Generated Script Content", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Themed Light Gray
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface), // Themed White

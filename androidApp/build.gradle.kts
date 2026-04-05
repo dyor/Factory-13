@@ -80,3 +80,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.junit)
 }
+
+tasks.withType<Test>().configureEach {
+    val filter = System.getenv("JOURNEYS_FILTER") ?: project.findProperty("JOURNEYS_FILTER") as String?
+    if (filter != null) {
+        environment("JOURNEYS_FILTER", filter)
+    }
+}

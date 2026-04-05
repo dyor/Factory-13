@@ -353,45 +353,47 @@ fun EditingStudioScreenContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Captions Dropdown Row
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    OutlinedButton(
-                        onClick = { showDropdown = true },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
-                    ) {
-                        val text = when (captionPosition) {
-                            CaptionPosition.TOP -> "Top Captions"
-                            CaptionPosition.BOTTOM -> "Bottom Captions"
-                            CaptionPosition.NONE -> "No Captions"
+                if (org.example.project.domain.isCaptionsSupported) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        OutlinedButton(
+                            onClick = { showDropdown = true },
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
+                        ) {
+                            val text = when (captionPosition) {
+                                CaptionPosition.TOP -> "Top Captions"
+                                CaptionPosition.BOTTOM -> "Bottom Captions"
+                                CaptionPosition.NONE -> "No Captions"
+                            }
+                            Text("$text ▼", maxLines = 1)
                         }
-                        Text("$text ▼", maxLines = 1)
-                    }
-                    DropdownMenu(
-                        expanded = showDropdown,
-                        onDismissRequest = { showDropdown = false },
-                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Top Captions", color = MaterialTheme.colorScheme.onSurface) },
-                            onClick = { 
-                                onUpdateCaptionPosition(CaptionPosition.TOP)
-                                showDropdown = false 
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Bottom Captions", color = MaterialTheme.colorScheme.onSurface) },
-                            onClick = { 
-                                onUpdateCaptionPosition(CaptionPosition.BOTTOM)
-                                showDropdown = false 
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("No Captions", color = MaterialTheme.colorScheme.onSurface) },
-                            onClick = { 
-                                onUpdateCaptionPosition(CaptionPosition.NONE)
-                                showDropdown = false 
-                            }
-                        )
+                        DropdownMenu(
+                            expanded = showDropdown,
+                            onDismissRequest = { showDropdown = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Top Captions", color = MaterialTheme.colorScheme.onSurface) },
+                                onClick = { 
+                                    onUpdateCaptionPosition(CaptionPosition.TOP)
+                                    showDropdown = false 
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Bottom Captions", color = MaterialTheme.colorScheme.onSurface) },
+                                onClick = { 
+                                    onUpdateCaptionPosition(CaptionPosition.BOTTOM)
+                                    showDropdown = false 
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("No Captions", color = MaterialTheme.colorScheme.onSurface) },
+                                onClick = { 
+                                    onUpdateCaptionPosition(CaptionPosition.NONE)
+                                    showDropdown = false 
+                                }
+                            )
+                        }
                     }
                 }
             }
