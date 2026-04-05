@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +41,9 @@ fun StudioBottomNavigationRow(
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text("←", fontSize = 20.sp)
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(bottom = 2.dp)) {
+                    Text("←", fontSize = 24.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                }
             }
 
             if (onArchive != null) {
@@ -51,7 +54,9 @@ fun StudioBottomNavigationRow(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("↓", fontSize = 20.sp)
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().padding(bottom = 2.dp)) {
+                        Text("↓", fontSize = 24.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    }
                 }
             }
 
@@ -65,9 +70,16 @@ fun StudioBottomNavigationRow(
                     disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
                     disabledContentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 ),
-                border = BorderStroke(1.dp, if (actionEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                border = BorderStroke(1.dp, if (actionEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+                contentPadding = PaddingValues(horizontal = 4.dp)
             ) {
-                Text(actionText, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = actionText,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             }
         }
     }
