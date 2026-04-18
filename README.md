@@ -15,52 +15,52 @@ Film Factory provides a complete studio experience right on your device, seamles
 ### Writer's Room Flow
 
 **Enter Prompt & Duration**  
-[<img src=".changereview/1_writers_room/images/displayState4.png" width="200" />](.changereview/1_writers_room/images/displayState4.png)
+<a href="./.changereview/1_writers_room/images/displayState4.png"><img src="./.changereview/1_writers_room/images/displayState4.png" width="200" /></a>
 
 **Generate Script**  
-[<img src=".changereview/1_writers_room/images/displayState7.png" width="200" />](.changereview/1_writers_room/images/displayState7.png)
+<a href="./.changereview/1_writers_room/images/displayState7.png"><img src="./.changereview/1_writers_room/images/displayState7.png" width="200" /></a>
 
 **Edit & Proceed**  
-[<img src=".changereview/1_writers_room/images/displayState10.png" width="200" />](.changereview/1_writers_room/images/displayState10.png)
+<a href="./.changereview/1_writers_room/images/displayState10.png"><img src="./.changereview/1_writers_room/images/displayState10.png" width="200" /></a>
 
 ---
 
 ### Recording Studio Flow
 
 **Start Recording**  
-[<img src=".changereview/4_publishing_studio/images/displayState6.png" width="200" />](.changereview/4_publishing_studio/images/displayState6.png)
+<a href="./.changereview/4_publishing_studio/images/displayState6.png"><img src="./.changereview/4_publishing_studio/images/displayState6.png" width="200" /></a>
 
 **Teleprompter Progress**  
-[<img src=".changereview/4_publishing_studio/images/displayState8.png" width="200" />](.changereview/4_publishing_studio/images/displayState8.png)
+<a href="./.changereview/4_publishing_studio/images/displayState8.png"><img src="./.changereview/4_publishing_studio/images/displayState8.png" width="200" /></a>
 
 **Stop & Advance**  
-[<img src=".changereview/4_publishing_studio/images/displayState9.png" width="200" />](.changereview/4_publishing_studio/images/displayState9.png)
+<a href="./.changereview/4_publishing_studio/images/displayState9.png"><img src="./.changereview/4_publishing_studio/images/displayState9.png" width="200" /></a>
 
 ---
 
 ### Editing Studio Flow
 
 **Fine-Tune Timeline**  
-[<img src=".changereview/4_publishing_studio/images/displayState11.png" width="200" />](.changereview/4_publishing_studio/images/displayState11.png)
+<a href="./.changereview/4_publishing_studio/images/displayState11.png"><img src="./.changereview/4_publishing_studio/images/displayState11.png" width="200" /></a>
 
 **Mark Bad Takes**  
-[<img src=".changereview/4_publishing_studio/images/displayState13.png" width="200" />](.changereview/4_publishing_studio/images/displayState13.png)
+<a href="./.changereview/4_publishing_studio/images/displayState13.png"><img src="./.changereview/4_publishing_studio/images/displayState13.png" width="200" /></a>
 
 **Preview Output**  
-[<img src=".changereview/4_publishing_studio/images/displayState15.png" width="200" />](.changereview/4_publishing_studio/images/displayState15.png)
+<a href="./.changereview/4_publishing_studio/images/displayState15.png"><img src="./.changereview/4_publishing_studio/images/displayState15.png" width="200" /></a>
 
 ---
 
 ### Publishing Studio Flow
 
 **Final Preview**  
-[<img src=".changereview/4_publishing_studio/images/displayState17.png" width="200" />](.changereview/4_publishing_studio/images/displayState17.png)
+<a href="./.changereview/4_publishing_studio/images/displayState17.png"><img src="./.changereview/4_publishing_studio/images/displayState17.png" width="200" /></a>
 
 **Play Clean Cut**  
-[<img src=".changereview/4_publishing_studio/images/displayState18.png" width="200" />](.changereview/4_publishing_studio/images/displayState18.png)
+<a href="./.changereview/4_publishing_studio/images/displayState18.png"><img src="./.changereview/4_publishing_studio/images/displayState18.png" width="200" /></a>
 
 **Export / Share**  
-[<img src=".changereview/4_publishing_studio/images/displayState21.png" width="200" />](.changereview/4_publishing_studio/images/displayState21.png)
+<a href="./.changereview/4_publishing_studio/images/displayState21.png"><img src="./.changereview/4_publishing_studio/images/displayState21.png" width="200" /></a>
 
 ---
 
